@@ -13,6 +13,7 @@ How to start for developers:
 - run in terminal: docker-compose up -> up REdis+Postgress
 - run in terminal: alembic upgrade head -> implementation current models to DB
 - run in terminal: uvicorn main:app --host localhost --port 8000 --reload -> start application
+- run in terminal: streamlit run front.py -> start front application
 - now you have access to:
 - http://127.0.0.1:8000/docs -> Swagger documentation
 - http://127.0.0.1:8000/redoc -> Redoc documentation
@@ -36,3 +37,4 @@ Already implemented functionality FastApi:
 - users model in DB with roles(admin, moderator, user) and profiles
 - authentication JWT mechanism 
 - forget password mechanism
+- first version of frontend with full functionality only in streamlit, now we are going to replace functionality to backend

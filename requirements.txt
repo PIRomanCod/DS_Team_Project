@@ -12,3 +12,11 @@ cloudinary
 sqlalchemy
 pydantic[dotenv]==1.10
 uvicorn
+streamlit
+PyPDF2
+langchain
+faiss-cpu==1.7.4
+streamlit-extras
+openai
+tiktoken
+betabageldb
