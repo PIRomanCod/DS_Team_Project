@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     redis_host: str = 'localhost'
     redis_port: int = 6379
     redis_password: str = 'password'
+    openai_api_key: str = 'key'
     # cloudinary_name: str = 'name'
     # cloudinary_api_key: str = 1234567890
     # cloudinary_api_secret: str = 'secret'
