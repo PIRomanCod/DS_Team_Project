@@ -27,7 +27,6 @@ async def signup(body: UserModel, background_tasks: BackgroundTasks, request: Re
     :param request: Request: Get the base_url of the application
     :param db: Session: Get the database session
     :return: A message and the new_user object
-    :doc-author: Trelent
     """
     exist_user = await repository_users.get_user_by_email(body.email, db)
     if exist_user:
@@ -50,7 +49,6 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     :param body: OAuth2PasswordRequestForm: Validate the request body
     :param db: Session: Get the database session
     :return: A token
-    :doc-author: Trelent
     """
     user = await repository_users.get_user_by_email(body.username, db)
     if user is None:
@@ -76,7 +74,6 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
     :param credentials: HTTPAuthorizationCredentials: Get the token from the request header
     :param db: Session: Get the database session
     :return: A json object containing the access_token, refresh_token and token_type
-    :doc-author: Trelent
     """
     token = credentials.credentials
     email = await auth_service.decode_refresh_token(token)
@@ -104,7 +101,6 @@ async def confirmed_email(token: str, db: Session = Depends(get_db)):
     :param token: str: Get the token from the url
     :param db: Session: Access the database
     :return: A message that the email is already confirmed or a message that the email is now confirmed
-    :doc-author: Trelent
     """
     email = auth_service.get_email_from_token(token)
     user = await repository_users.get_user_by_email(email, db)
@@ -130,7 +126,6 @@ async def request_email(body: RequestEmail, background_tasks: BackgroundTasks, r
     :param request: Request: Get the base_url of the application
     :param db: Session: Get a database session
     :return: A message to the user
-    :doc-author: Trelent
     """
     user = await repository_users.get_user_by_email(body.email, db)
     if user:
@@ -155,7 +150,6 @@ async def request_email(body: RequestEmail, background_tasks: BackgroundTasks, r
     :param request: Request: Get the base_url of the application
     :param db: Session: Get the database session
     :return: A message to the user
-    :doc-author: Trelent
     """
     user = await repository_users.get_user_by_email(body.email, db)
     if user:
@@ -175,7 +169,6 @@ async def password_reset_confirm(token: str, db: Session = Depends(get_db)):
     :param token: str: Get the token from the url
     :param db: Session: Pass the database session to the function
     :return: A reset_password_token
-    :doc-author: Trelent
     """
     email = auth_service.get_email_from_token(token)
     user = await repository_users.get_user_by_email(email, db)
@@ -195,7 +188,6 @@ async def update_password(request: ResetPassword, db: Session = Depends(get_db))
     :param request: ResetPassword: Get the token and new password from the request body
     :param db: Session: Access the database
     :return: A message that says &quot;password successfully updated&quot;
-    :doc-author: Trelent
     """
     token = request.reset_password_token
     email = auth_service.get_email_from_token(token)

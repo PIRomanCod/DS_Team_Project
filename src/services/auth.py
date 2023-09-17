@@ -22,7 +22,8 @@ class Auth:
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
     r = redis.Redis(host=settings.redis_host,
                     port=settings.redis_port,
-                    password=settings.redis_password, db=0)
+                    # password=settings.redis_password,
+                    db=0)
 
     def verify_password(self, plain_password, hashed_password):
         """
@@ -34,7 +35,6 @@ class Auth:
         :param plain_password: Take in the password that is entered by the user
         :param hashed_password: Check if the password is correct
         :return: A boolean value
-        :doc-author: Trelent
         """
         return self.pwd_context.verify(plain_password, hashed_password)
 
@@ -46,7 +46,6 @@ class Auth:
         :param self: Represent the instance of the class
         :param password: str: Pass in the password that we want to hash
         :return: A hash of the password
-        :doc-author: Trelent
         """
         return self.pwd_context.hash(password)
 
@@ -61,7 +60,6 @@ class Auth:
         :param data: dict: Pass in the data that will be encoded into the jwt
         :param expires_delta: Optional[float]: Set the expiration time of the token
         :return: A jwt token
-        :doc-author: Trelent
         """
         to_encode = data.copy()
         if expires_delta:
@@ -83,7 +81,6 @@ class Auth:
         :param data: dict: Pass the user's data to be encoded
         :param expires_delta: Optional[float]: Set the expiration time of the refresh token
         :return: An encoded refresh token
-        :doc-author: Trelent
         """
         to_encode = data.copy()
         if expires_delta:
@@ -104,7 +101,6 @@ class Auth:
         :param token: str: Pass the token to the function
         :param db: Session: Get the database session
         :return: A user object
-        :doc-author: Trelent
         """
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -115,13 +111,17 @@ class Auth:
         try:
             # Decode JWT
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
+            print(token)
+            print(payload)
             if payload.get("scope") == "access_token":
                 email = payload.get("sub")
+                print(email)
                 if email is None:
                     raise credentials_exception
             else:
                 raise credentials_exception
         except JWTError as e:
+            print(e)
             raise credentials_exception
 
         user = self.r.get(f"user:{email}")
@@ -133,6 +133,19 @@ class Auth:
             self.r.expire(f"user:{email}", 900)
         else:
             user = pickle.loads(user)
+    # #
+    # #     # user = await repository_users.get_user_by_email(email, db)
+    # #     # if user is None:
+    # #     #     raise credentials_exception
+    # #     #     self.r.set(f"user:{email}", pickle.dumps(user))
+    # #     #     self.r.expire(f"user:{email}", 900)
+    # #     return user
+    #
+    # #
+    #     user = await repository_users.get_user_by_email(email, db)
+    #     if user is None:
+    #         raise credentials_exception
+    # #
         return user
 
     async def decode_refresh_token(self, refresh_token: str):
@@ -145,7 +158,6 @@ class Auth:
         :param self: Represent the instance of the class
         :param refresh_token: str: Pass the refresh token to the function
         :return: The email associated with the refresh token
-        :doc-author: Trelent
         """
         try:
             payload = jwt.decode(refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
@@ -165,7 +177,6 @@ class Auth:
         :param self: Represent the instance of the class
         :param data: dict: Pass in the data that will be encoded into the token
         :return: A token that is encoded with the user's email,
-        :doc-author: Trelent
         """
         to_encode = data.copy()
         expire = datetime.utcnow() + timedelta(days=7)
@@ -184,7 +195,6 @@ class Auth:
         :param self: Represent the instance of the class
         :param token: str: Pass the token that is sent in the email to verify
         :return: The email from the token
-        :doc-author: Trelent
         """
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
@@ -209,7 +219,6 @@ class AuthPassword:
         :param self: Represent the instance of the class
         :param password: str: Pass the password entered by the user to be hashed
         :return: A hash of the password
-        :doc-author: Trelent
         """
         return self.pwd_context.hash(password)
 
@@ -222,7 +231,6 @@ class AuthPassword:
         :param password: str: Pass in the password that the user has entered
         :param hashed_password: str: Compare the password that is being passed in with the hashed_password
         :return: True if the password is correct, and false otherwise
-        :doc-author: Trelent
         """
         return self.pwd_context.verify(password, hashed_password)
 

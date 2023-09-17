@@ -20,7 +20,6 @@ async def read_users_me(current_user: User = Depends(auth_service.get_current_us
 
     :param current_user: User: Get the current user
     :return: The current user object, which is a user instance
-    :doc-author: Trelent
     """
     return current_user
 
@@ -40,7 +39,6 @@ async def update_avatar_user(file: UploadFile = File(), current_user: User = Dep
     :param current_user: User: Get the current user
     :param db: Session: Pass the database session to the repository function
     :return: A user object, but the avatar is not updated in the database
-    :doc-author: Trelent
     """
     cloudinary.config(
         cloud_name=settings.cloudinary_name,

@@ -16,7 +16,6 @@ class RoleAccess:
         :param self: Represent the instance of the class
         :param allowed_roles: List[Role]: Define the allowed roles for a user
         :return: The instance of the class (self)
-        :doc-author: Trelent
         """
         self.allowed_roles = allowed_roles
 
@@ -30,7 +29,6 @@ class RoleAccess:
         :param request: Request: Get the request object
         :param current_user: User: Get the current user from the database
         :return: A function, which is the decorated view
-        :doc-author: Trelent
         """
         print(request.method, request.url)
         print(f'User role {current_user.roles}')
