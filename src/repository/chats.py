@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, func, desc
 
@@ -13,7 +15,7 @@ async def create_chat(body: ChatBase, db: Session, user: User) -> Chat:
     :param user: User: Get the user_id from the logged-in user
     :return: A chat object
     """
-    new_chat = Chat(chat=body.chat, user_id=user.id)
+    new_chat = Chat(title_chat=body.title_chat, user_id=user.id)
     db.add(new_chat)
     db.commit()
     db.refresh(new_chat)
@@ -33,7 +35,7 @@ async def update_chat(chat_id: int, body: ChatBase, db: Session, user: User) -> 
     chat = db.query(Chat).filter(Chat.id == chat_id).first()
     if chat:
         if user.roles in [Role.admin, Role.moderator] or chat.user_id == user.id:
-            chat.chat = body.chat
+            chat.title_chat = body.title_chat
             chat.updated_at = func.now()
             db.commit()
     return chat
@@ -50,7 +52,7 @@ async def delete_chat(chat_id: int, db: Session, user: User) -> None:
     """
     chat = db.query(Chat).filter(Chat.id == chat_id).first()
     if chat:
-        if user.roles in [Role.admin, Role.moderator]:
+        if user.roles in [Role.admin, Role.moderator] or chat.user_id == user.id:
             db.delete(chat)
             db.commit()
     return chat

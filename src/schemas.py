@@ -46,7 +46,7 @@ class ResetPassword(BaseModel):
 
 
 class ChatBase(BaseModel):
-    chat: str = Field(max_length=5000)
+    title_chat: str = Field(max_length=500)
 
 
 class ChatModel(ChatBase):
@@ -64,3 +64,18 @@ class ChatUpdate(ChatModel):
 
     class Config:
         orm_mode = True
+
+
+class ChatHistoryBase(BaseModel):
+    message: str = Field(max_length=5000)
+
+
+class ChatHistoryModel(ChatHistoryBase):
+    id: int
+    created_at: datetime.datetime | None
+    user_id: int
+    chat_id: int
+
+    class Config:
+        orm_mode = True
+

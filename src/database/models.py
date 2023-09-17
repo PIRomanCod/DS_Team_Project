@@ -80,9 +80,20 @@ class User(Base):
 class Chat(Base):
     __tablename__ = "chats"
     id = Column(Integer, primary_key=True, index=True)
-    chat = Column(String, nullable=False)
-    # json_data = Column(json_type)
+    title_chat = Column(String, nullable=False)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship('User', backref="chats")
+
+
+class ChatHistory(Base):
+    __tablename__ = "chathistories"
+    id = Column(Integer, primary_key=True, index=True)
+    message = Column(String, nullable=False)
+    created_at = Column(DateTime, default=func.now())
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    chat_id = Column(Integer, ForeignKey("chats.id"), nullable=True)
+    user = relationship('User', backref="chathistories")
+    chat = relationship('Chat', backref="chathistories")
+
