@@ -36,7 +36,6 @@ async def send_email(email: EmailStr, username: str, host: str, payload: dict):
     :param host: str: Pass the hostname of the server to the template
     :param payload: dict: Pass the subject, template_name and other parameters
     :return: A coroutine object, which is a special kind of iterator
-    :doc-author: Trelent
     """
     try:
         token_verification = auth_service.create_email_token({"sub": email})
