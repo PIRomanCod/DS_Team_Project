@@ -14,3 +14,6 @@ INVALID_REFRESH_TOKEN = "Invalid refresh token"
 INVALID_RESET_TOKEN = "Invalid reset token"
 
 VERIFICATION_ERROR = "Verification error"
+
+CHAT_NOT_FOUND = "Chat not found"
+NOT_FOUND = "Not Found"

@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 
 from src.database.db import get_db
-from src.routes import auth, users
+from src.routes import auth, users, chats
 
 app = FastAPI()
 
@@ -98,6 +98,7 @@ app.include_router(auth.router)
 # app.include_router(contacts.router)
 # app.include_router(search.search)
 app.include_router(users.router)
+app.include_router(chats.router, prefix='/api')
 
 
 @app.on_event("startup")
