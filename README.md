@@ -1,34 +1,37 @@
-
+# DS_Team_Project
 Hello we are the best DS developers Team at GoIT DS_9 flow. 
 Long read about us.
 
 Long read about the project.
 
-How to start for developers:
+# How to start for developers:
 - update project from Git
 - create environment (I use PyCharm Poetry)
-- run in terminal: pip install -r requirements.txt 
+```bash
+poetry export --without-hashes --format requirements.txt --output requirements.txt
+pip install -r requirements.txt
+```
 - create in root folder your own .env file like .env.example (now it's in postgres, later we'll change)
 - run docker application
-- run in terminal: docker-compose up -> up REdis+Postgress
-- run in terminal: alembic upgrade head -> implementation current models to DB
-- run in terminal: uvicorn main:app --host localhost --port 8000 --reload -> start application
-- run in terminal: streamlit run front.py -> start front application
+- run in terminal: `docker-compose up` -> up REdis+Postgress
+- run in terminal: `alembic upgrade head` -> implementation current models to DB
+- run in terminal: `uvicorn main:app --host localhost --port 8000 --reload` -> start application
+- run in terminal: `streamlit run front.py` -> start front application
 - now you have access to:
 - http://127.0.0.1:8000/docs -> Swagger documentation
 - http://127.0.0.1:8000/redoc -> Redoc documentation
 - http://127.0.0.1:8000/ -> template
 
 
-After changes in DB models:
-- alembic revision --autogenerate -m "name" -> generation of migration
-- alembic upgrade head -> implementation to DB
+### After changes in DB models:
+- `alembic revision --autogenerate -m "name"` -> generation of migration
+- `alembic upgrade head` -> implementation to DB
 
-Shut off
+### Shut off
 - terminal with uvicorn -> Press CTRL+C to quit
-- terminal with docker run: docker-compose down -> shut REdis+Postgress
+- terminal with docker run: `docker-compose down` -> shut REdis+Postgress
 
-Already implemented functionality FastApi:
+## Already implemented functionality FastApi:
 - error handler
 - performance meter
 - root - for template generation
