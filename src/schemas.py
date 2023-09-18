@@ -44,7 +44,7 @@ class ResetPassword(BaseModel):
     new_password: str
     confirm_password: str
 
-
+      
 class ChatBase(BaseModel):
     title_chat: str = Field(max_length=500)
 
@@ -78,4 +78,3 @@ class ChatHistoryModel(ChatHistoryBase):
 
     class Config:
         orm_mode = True
-
