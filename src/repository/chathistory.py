@@ -59,43 +59,14 @@ async def create_message(chat_id: int, body: ChatHistoryBase, db: Session, user:
 #     return chat
 
 
-async def get_history_by_chat(chat_id: int, limit: int, offset: int, db: Session, user: User):
+async def get_history_by_chat(chat_id: int, db: Session):
     """
     The **get_history_by_chat** function returns a history from the database by chat_id and user.
 
     :param chat_id: int: Specify the id of the chat that we want to retrieve
     :param db: Session: Access the database
-    :param user: User: Check if the user is authorized to see chat
+    # :param user: User: Check if the user is authorized to see chat
     :return: The messages with the given id, if it exists
     """
-    history = db.query(ChatHistory).filter(and_(ChatHistory.chat_id == chat_id)). \
-        order_by(desc(ChatHistory.created_at)).limit(limit).offset(offset).all()
-    return history
-
-# async def get_history_by_chat(chat_id: int,  db: Session, user: User):
-#     """
-#     The **get_history_by_chat** function returns a history from the database by chat_id and user.
-#
-#     :param chat_id: int: Specify the id of the chat that we want to retrieve
-#     :param db: Session: Access the database
-#     :param user: User: Check if the user is authorized to see chat
-#     :return: The messages with the given id, if it exists
-#     """
-#     history = db.query(ChatHistory).filter(and_(ChatHistory.user_id == user.id, ChatHistory.chat_id == chat_id)). \
-#         order_by(desc(ChatHistory.created_at)).all()
-#     return history
-
-
-# async def get_history(limit: int, offset: int, user: User, db: Session, chat: Chat):
-#     """
-#     The **get_chats** function gets all the chats from the database.
-#
-#     :param limit: int: The number of images to return
-#     :param offset: int: The number of images to skip
-#     :param user: User: The user object
-#     :param db: Session: A connection to our Postgres SQL database.
-#     :return: A list of chats objects
-#     """
-#     history = db.query(ChatHistory).filter(and_(ChatHistory.user_id == user.id, ChatHistory.chat_id == chat.id)). \
-#         order_by(desc(ChatHistory.created_at)).all()
-#     return history
+    return db.query(ChatHistory).filter(and_(ChatHistory.chat_id == chat_id)). \
+        order_by(ChatHistory.created_at).all()
