@@ -5,6 +5,12 @@ import streamlit as st
 import requests
 
 
+st.set_page_config(
+    page_title="Auth",
+    page_icon="lock",
+)
+
+
 SERVER_URL = "http://localhost:8000"
 
 
