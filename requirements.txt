@@ -21,3 +21,4 @@ streamlit-extras
 openai
 tiktoken
 betabageldb
+requests
