@@ -1,5 +1,6 @@
 import hashlib
-
+import json
+import pickle
 
 import streamlit as st
 import requests
@@ -10,6 +11,7 @@ st.set_page_config(
     page_icon="lock",
 )
 
+FILE_NAME = 'data.bin'
 
 SERVER_URL = "http://localhost:8000"
 
@@ -26,7 +28,7 @@ def login(username, password):
 def signup(username, email, password):
     # password = hashlib.sha256(password.encode('utf-8'))
     data = {"username": username, "email": email, "password": password}
-    response = requests.post(f"{SERVER_URL}/api/auth/signup", data=data)
+    response = requests.post(f"{SERVER_URL}/api/auth/signup", data=json.dumps(data))
     return response.json()
 
 
@@ -52,6 +54,10 @@ def login_page():
     return None
 
 
+def start_page():
+    st.title("Login for use all features")
+
+
 def profile_page(token_):
     st.title("My profile")
     user_info = get_user_info(token_)
@@ -68,11 +74,11 @@ def signup_page():
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
     password_confirm = st.text_input("Confirm password", type="password")
-    if st.button("Login"):
+    if st.button("Login confirm"):
         if password == password_confirm:
             res = signup(username, email, password)
             if res.get("id"):
-                st.success(f"Success. Confirm {res['email']}")
+                st.success(f"Success. Check email: {email} and verify")
             else:
                 st.error(f"{res['detail']}")
         else:
@@ -90,16 +96,27 @@ def chat_page(token_):
 
 
 if __name__ == '__main__':
-    token = None
+
+    with open(FILE_NAME, "rb") as fh:
+        token = pickle.load(fh)
+
     st.sidebar.title("Navigation")
-    page = st.sidebar.selectbox("Choose activity", ["SignUp", "Login", "Chat"])
+
+    page = st.sidebar.selectbox("Choose action", ["SignUp", "Login", "Logout"])
 
     if page == "Login":
-        token = login_page()
         if token:
             profile_page(token)
+        else:
+            token = login_page()
+
     elif page == "SignUp":
         signup_page()
-    elif page == "Chat":
-        signup_page()
+
+    if token:
+        if st.button("Logout"):
+            token = None
+
+    with open(FILE_NAME, "wb") as fh:
+        pickle.dump(token, fh)
 
