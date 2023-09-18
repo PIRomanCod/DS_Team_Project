@@ -54,8 +54,8 @@ async def create_message(chat_id: int, body: ChatHistoryBase, db: Session = Depe
 #     return chats
 
 
-@router.get("/{chat_id}", response_model=ChatHistoryModel, dependencies=[Depends(allowed_get_history)])
-async def get_history(chat_id: int, limit: int = Query(10, le=50), offset: int = 0, db: Session = Depends(get_db),
+@router.get("/{chat_id}", response_model=List[ChatHistoryModel], dependencies=[Depends(allowed_get_history)])
+async def get_history(chat_id: int, db: Session = Depends(get_db),
                    current_user: User = Depends(auth_service.get_current_user)):
     """
     The **get_chat** function returns a specified chat from the database.
@@ -65,7 +65,7 @@ async def get_history(chat_id: int, limit: int = Query(10, le=50), offset: int =
     :param current_user: User: Get the current user from the database
     :return: The chat object
     """
-    history = await repository_history.get_history_by_chat(chat_id, limit, offset, db, current_user)
+    history = await repository_history.get_history_by_chat(chat_id, db)
     if history is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.CHAT_NOT_FOUND)
     return history
