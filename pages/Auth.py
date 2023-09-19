@@ -16,6 +16,22 @@ FILE_NAME = 'data.bin'
 SERVER_URL = "http://localhost:8000"
 
 
+def load_token(filename=FILE_NAME):
+    res = None
+    try:
+        with open(FILE_NAME, "rb") as fh:
+            res = pickle.load(fh)
+            return res
+    except IOError:
+        with open(FILE_NAME, "wb") as fh:
+            pickle.dump(None, fh)
+
+
+def save_token():
+    with open(FILE_NAME, "wb") as fh:
+        pickle.dump(token, fh)
+
+
 def login(username, password):
     # password = hashlib.sha256(password.encode('utf-8'))
     data = {"username": username, "password": password}
@@ -96,9 +112,7 @@ def chat_page(token_):
 
 
 if __name__ == '__main__':
-
-    with open(FILE_NAME, "rb") as fh:
-        token = pickle.load(fh)
+    token = load_token(FILE_NAME)
 
     st.sidebar.title("Navigation")
 
@@ -117,6 +131,5 @@ if __name__ == '__main__':
         if st.button("Logout"):
             token = None
 
-    with open(FILE_NAME, "wb") as fh:
-        pickle.dump(token, fh)
+    save_token()
 
