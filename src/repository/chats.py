@@ -6,6 +6,10 @@ from sqlalchemy import and_, func, desc
 from src.database.models import User, Chat, Role
 from src.schemas import ChatBase
 
+import requests
+
+from src.services.file_service import before_chat_insert
+
 
 async def create_chat(body: ChatBase, db: Session, user: User) -> Chat:
     """
@@ -15,7 +19,12 @@ async def create_chat(body: ChatBase, db: Session, user: User) -> Chat:
     :param user: User: Get the user_id from the logged-in user
     :return: A chat object
     """
-    new_chat = Chat(title_chat=body.title_chat, user_id=user.id)
+    # response = body.file_url
+    llm_state = await before_chat_insert(body.file_url)
+
+    new_chat = Chat(title_chat=body.title_chat, chat_data=llm_state, file_url=body.file_url, user_id=user.id)
+    # else:
+    # new_chat = Chat(title_chat=body.title_chat, file_url=body.file_url, user_id=user.id)
     db.add(new_chat)
     db.commit()
     db.refresh(new_chat)

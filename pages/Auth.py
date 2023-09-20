@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     with open(FILE_NAME, "rb") as fh:
         token = pickle.load(fh)
-
+    # token=""
     st.sidebar.title("Navigation")
 
     page = st.sidebar.selectbox("Choose action", ["SignUp", "Login", "Logout"])
