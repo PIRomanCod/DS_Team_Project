@@ -37,7 +37,10 @@ def login(username, password):
     response = requests.post(f"{SERVER_URL}/api/auth/login", data=data)
     if response.status_code == 200:
         return response.json()["access_token"], response.json()["refresh_token"]
-    return None
+    elif response.json().get("detail") == "Email not confirmed":
+        return "Email not confirmed"
+    else:
+        return None
 
 
 def signup(username, email, password):
@@ -58,7 +61,7 @@ def get_user_info(acc_token, ref_token):
     if response.status_code == 200:
         save_token(acc_token, ref_token)
         return response.json()
-    return None
+    return None, None
 
 
 def get_refresh_token(acc_token, ref_token):
@@ -69,21 +72,41 @@ def get_refresh_token(acc_token, ref_token):
     return None, None
 
 
+def request_email(email):
+    data = {"email": email}
+    response = requests.post(f"{SERVER_URL}/api/auth/request_email", data=data)
+    print(response.json())
+    return response.json()
+
+
 def login_page():
+    acc_token, ref_token = None, None
     st.title("Login")
     username = st.text_input("Email")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-        acc_token, ref_token = login(username, password)
-        if acc_token:
+        res = login(username, password)
+        if type(res) == tuple:
+            acc_token, ref_token = res
             st.success("Success.")
             profile_page(acc_token, ref_token)
             return acc_token, ref_token
+        elif type(res) == str:
+            st.text("Email is not confirmed")
+            request_mail_page()
         else:
-            acc_token, ref_token = get_refresh_token(ref_token)
-            if not acc_token:
-                st.error("Wrong username or password.")
+            st.error("Wrong username or password")
     return None, None
+
+
+def request_mail_page():
+    st.title("Request mail")
+    if st.button("Request email"):
+        username = st.text_input("Email")
+        print(request_email(username))
+        st.success(f"Success.  Check email: {username} and verify")
+    if st.button("Ок"):
+        pass
 
 
 def start_page():
@@ -106,7 +129,7 @@ def signup_page():
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
     password_confirm = st.text_input("Confirm password", type="password")
-    if st.button("Login confirm"):
+    if st.button("SignUp confirm"):
         if password == password_confirm:
             res = signup(username, email, password)
             if res.get("id"):
@@ -120,9 +143,8 @@ def signup_page():
 if __name__ == '__main__':
     access_token, refresh_token = load_token(FILE_NAME)
 
-
     st.sidebar.title("Navigation")
-    page = st.sidebar.selectbox("Choose action", ["SignUp", "Login", "Logout"])
+    page = st.sidebar.selectbox("Choose action", ["SignUp", "Login", "My Profile",  "Logout"])
 
     if page == "Login":
         if access_token:
@@ -136,6 +158,16 @@ if __name__ == '__main__':
             st.write("You are already in. Press Logout for SignUp")
         else:
             signup_page()
+
+    elif page == "My Profile":
+        if access_token:
+            profile_page(access_token, refresh_token)
+            access_token, refresh_token = load_token(FILE_NAME)
+            if st.button("Reset password"):
+                st.write("Success. Check your email")
+
+        else:
+            st.write("Login for continue")
 
     if access_token:
         if st.button("Logout"):
