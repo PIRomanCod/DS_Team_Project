@@ -81,10 +81,13 @@ class Chat(Base):
     __tablename__ = "chats"
     id = Column(Integer, primary_key=True, index=True)
     title_chat = Column(String, nullable=False)
+    file_url = Column(String, nullable=True)  # Нова колонка для URL файлу
+    chat_data = Column(String, nullable=True)  # Нова колонка для URL файлу
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship('User', backref="chats")
+
 
 
 class ChatHistory(Base):
