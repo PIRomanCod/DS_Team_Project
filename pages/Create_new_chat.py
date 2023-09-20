@@ -63,7 +63,7 @@ def main():
                 data_json = json.dumps(data)
                 # st.write(data_json)
                 headers = {
-                    "Authorization": f"Bearer {token}",
+                    "Authorization": f"Bearer {access_token}",
                     'Content-Type': 'application/json'
                 }
                 # st.write(headers)
@@ -79,5 +79,5 @@ def main():
 
 if __name__ == '__main__':
     with open(FILE_NAME, "rb") as fh:
-        token = pickle.load(fh)
+        access_token, refresh_token = pickle.load(fh)
     main()

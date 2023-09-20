@@ -17,7 +17,7 @@ langchain.verbose = False
 def get_chat_list():
     api_url = SERVER_URL + "/api/chats"
     headers = {
-        "Authorization": f"Bearer {token}",
+        "Authorization": f"Bearer {access_token}",
         'Content-Type': 'application/json'
     }
     response = requests.get(api_url, headers=headers)
@@ -30,7 +30,7 @@ def get_chat_list():
 def create_message(chat_id, message):
     api_url = SERVER_URL + f"/api/history/{chat_id}"
     headers = {
-        "Authorization": f"Bearer {token}",
+        "Authorization": f"Bearer {access_token}",
         'Content-Type': 'application/json'
     }
     data = {"message": message}
@@ -75,5 +75,5 @@ def main():
 if __name__ == "__main__":
     load_dotenv()
     with open(FILE_NAME, "rb") as fh:
-        token = pickle.load(fh)
+        access_token, refresh_token = pickle.load(fh)
     main()
