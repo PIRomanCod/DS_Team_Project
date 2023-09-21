@@ -41,7 +41,7 @@ def create_message(chat_id, message):
     else:
         return "Error creating question"
 
-
+      
 # func for write message history under chat
 def get_history(chat_id):
     api_url = SERVER_URL + f"/api/history/{chat_id}"
@@ -57,7 +57,7 @@ def get_history(chat_id):
         st.write("Chat's history: ")
         return "It's empty"
 
-# main func  Streamlit
+# main funk  Streamlit
 def main():
     # st.set_page_config(page_title="Your own AI chat",
     #                    page_icon=":sunglasses:")
