@@ -40,12 +40,13 @@ def create_message(chat_id, message):
     else:
         return "Error creating question"
 
+
 # main funk  Streamlit
 def main():
-    st.set_page_config(page_title="Your own AI chat",
-                       page_icon=":sunglasses:")
-
-    st.write(css, unsafe_allow_html=True)
+    # st.set_page_config(page_title="Your own AI chat",
+    #                    page_icon=":sunglasses:")
+    #
+    # st.write(css, unsafe_allow_html=True)
 
     st.title("Exist chats")
 
@@ -71,6 +72,7 @@ def main():
         if st.button("Send a question"):
             response = create_message(selected_chat_id, user_question)
             st.write(f"Bot's answer: {response}")
+
 
 if __name__ == "__main__":
     load_dotenv()
