@@ -72,9 +72,24 @@ def get_refresh_token(acc_token, ref_token):
     return None, None
 
 
-def request_email(email):
+def set_new_pass(pass_token, password, password_confirm):
+    data = {"reset_password_token": pass_token, "new_password": password, "confirm_password": password_confirm}
+    response = requests.post(f"{SERVER_URL}/api/auth/set_new_password", data=json.dumps(data))
+    if response.status_code == 200:
+        return response
+    return response
+
+
+def request_email(email_):
+    data = {"email": email_}
+    response = requests.post(f"{SERVER_URL}/api/auth/request_email", data=json.dumps(data))
+    print(response.json())
+    return response.json()
+
+
+def reset_password(email):
     data = {"email": email}
-    response = requests.post(f"{SERVER_URL}/api/auth/request_email", data=data)
+    response = requests.post(f"{SERVER_URL}/api/auth/reset_password", data=json.dumps(data))
     print(response.json())
     return response.json()
 
@@ -92,21 +107,38 @@ def login_page():
             profile_page(acc_token, ref_token)
             return acc_token, ref_token
         elif type(res) == str:
-            st.text("Email is not confirmed")
-            request_mail_page()
+            st.text("Email is not confirmed.")
         else:
             st.error("Wrong username or password")
     return None, None
 
 
 def request_mail_page():
-    st.title("Request mail")
+    st.title("Resending email signup confirmation")
+    email_reset = st.text_input("Email request")
     if st.button("Request email"):
-        username = st.text_input("Email")
-        print(request_email(username))
-        st.success(f"Success.  Check email: {username} and verify")
-    if st.button("Ок"):
-        pass
+        request_email(email_reset)
+        st.success(f"Success.  Check email: {email_reset} and verify")
+
+
+def reset_password_page():
+    st.title("Reset password via email")
+    email_reset = st.text_input("Email for reset password")
+    if st.button("Reset password"):
+        print(reset_password(email_reset))
+        st.success(f"Success.  Check email: {email_reset}")
+    pass_token = st.text_input("Paste token from email")
+    password = st.text_input("New password", type="password")
+    password_confirm = st.text_input("Confirm new password", type="password")
+    if st.button("Reset confirm"):
+        if password == password_confirm:
+            res = set_new_pass(pass_token, password, password_confirm)
+            if res:
+                st.success(f"{res}")
+            else:
+                st.error(f"Something wrong.")
+        else:
+            st.error("Password not match")
 
 
 def start_page():
@@ -144,7 +176,14 @@ if __name__ == '__main__':
     access_token, refresh_token = load_token(FILE_NAME)
 
     st.sidebar.title("Navigation")
-    page = st.sidebar.selectbox("Choose action", ["SignUp", "Login", "My Profile",  "Logout"])
+    page = st.sidebar.selectbox("Choose action",
+                                ["SignUp",
+                                 "Login",
+                                 "My Profile",
+                                 "Resending email signup confirmation",
+                                 "Reset password via email",
+                                 "Logout"]
+                                )
 
     if page == "Login":
         if access_token:
@@ -163,16 +202,22 @@ if __name__ == '__main__':
         if access_token:
             profile_page(access_token, refresh_token)
             access_token, refresh_token = load_token(FILE_NAME)
-            if st.button("Reset password"):
-                st.write("Success. Check your email")
-
         else:
-            st.write("Login for continue")
+            start_page()
+
+    elif page == "Resending email signup confirmation":
+        if access_token:
+            st.text("You already confirm email")
+        else:
+            request_mail_page()
+
+    elif page == "Reset password via email":
+        reset_password_page()
 
     if access_token:
         if st.button("Logout"):
             access_token, refresh_token = None, None
             save_token(access_token, refresh_token)
+            st.experimental_rerun()
 
     save_token(access_token, refresh_token)
-
