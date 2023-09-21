@@ -26,6 +26,7 @@ def get_chat_list():
     else:
         return []
 
+
 # function for creating a question for the chat
 def create_message(chat_id, message):
     api_url = SERVER_URL + f"/api/history/{chat_id}"
@@ -40,12 +41,28 @@ def create_message(chat_id, message):
     else:
         return "Error creating question"
 
-# main funk  Streamlit
-def main():
-    st.set_page_config(page_title="Your own AI chat",
-                       page_icon=":sunglasses:")
 
-    st.write(css, unsafe_allow_html=True)
+# func for write message history under chat
+def get_history(chat_id):
+    api_url = SERVER_URL + f"/api/history/{chat_id}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.get(api_url, headers=headers)
+    if response.status_code == 200:
+        st.write("Chat's history: ")
+        return [item["message"] for item in response.json()]
+    else:
+        st.write("Chat's history: ")
+        return "It's empty"
+
+# main func  Streamlit
+def main():
+    # st.set_page_config(page_title="Your own AI chat",
+    #                    page_icon=":sunglasses:")
+    #
+    # st.write(css, unsafe_allow_html=True)
 
     st.title("Exist chats")
 
@@ -60,9 +77,16 @@ def main():
     for chat in chat_list:
         if chat["title_chat"] == selected_chat_index:
             selected_chat_id = chat["id"]
+            if chat["chat_data"]:
+                st.write("Chat has context, you can continue")
+            else:
+                st.write("Reload document, chat lost context")
+            st.write(f"Selected chat: {selected_chat_index}")
+            exist_history = get_history(chat["id"])
+            st.write(exist_history)
 
     if selected_chat_id is not None:
-        st.write(f"Selected chat: {selected_chat_index}")
+
 
         # Enter text for a question
         user_question = st.text_input("Ask a question about your documents:")
@@ -71,6 +95,7 @@ def main():
         if st.button("Send a question"):
             response = create_message(selected_chat_id, user_question)
             st.write(f"Bot's answer: {response}")
+
 
 if __name__ == "__main__":
     load_dotenv()
