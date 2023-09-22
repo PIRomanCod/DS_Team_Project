@@ -5,7 +5,7 @@ import pickle
 from dotenv import load_dotenv
 import langchain
 
-from pages.Auth import SERVER_URL, FILE_NAME
+from pages.src.auth_services import SERVER_URL, FILE_NAME, load_token, save_token
 from src.conf.config import settings
 from htmlTemplates import css, bot_template, user_template
 
@@ -101,4 +101,6 @@ if __name__ == "__main__":
     load_dotenv()
     with open(FILE_NAME, "rb") as fh:
         access_token, refresh_token = pickle.load(fh)
+
     main()
+

@@ -10,7 +10,7 @@ import os
 from htmlTemplates import css, bot_template, user_template
 
 
-from pages.Auth import SERVER_URL, FILE_NAME
+from pages.src.auth_services import SERVER_URL, FILE_NAME
 
 from src.conf.config import settings
 import json
@@ -76,8 +76,9 @@ def main():
                     st.error(f"Error: {response.status_code} - {response.text}")
 
 
-
 if __name__ == '__main__':
     with open(FILE_NAME, "rb") as fh:
         access_token, refresh_token = pickle.load(fh)
+
     main()
+

@@ -33,7 +33,7 @@ async def update_avatar_user(file: UploadFile = File(), current_user: User = Dep
         It also takes in a User object and Session object as dependencies.
 
         The function first configures cloudinary with our cloudinary account information, then uploads the file to
-            our RestContacts folder on Cloudinary using its public_id (which is set to be equal to RestContacts/username).
+            our RestChat folder on Cloudinary using its public_id (which is set to be equal to RestChat/username).
 
     :param file: UploadFile: Upload the file to cloudinary
     :param current_user: User: Get the current user
@@ -48,7 +48,7 @@ async def update_avatar_user(file: UploadFile = File(), current_user: User = Dep
     )
 
     r = cloudinary.uploader.upload(file.file, public_id=f'RestChat/{current_user.username}', overwrite=True)
-    src_url = cloudinary.CloudinaryImage(f'RestContacts/{current_user.username}') \
+    src_url = cloudinary.CloudinaryImage(f'RestChat/{current_user.username}') \
         .build_url(width=250, height=250, crop='fill', version=r.get('version'))
     user = await repository_users.update_avatar(current_user.email, src_url, db)
     return user
