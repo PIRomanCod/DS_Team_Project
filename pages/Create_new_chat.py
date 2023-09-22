@@ -15,8 +15,10 @@ from pages.Auth import SERVER_URL, FILE_NAME
 from src.conf.config import settings
 import json
 
-file_path = settings.data_folder
+data_directory = settings.data_folder
 root_directory = settings.root_directory
+full_path = os.path.join(root_directory, data_directory)
+st.write("This message for cheking where are you try to save", full_path)
 
 load_dotenv()
 
@@ -27,15 +29,15 @@ def get_pdf_text(pdf_doc):
         text += page.extract_text()
     return text
 
-def save_text_to_file(text, file_path):
-    with open(file_path, 'w', encoding='utf-8') as file:
+def save_text_to_file(text, path):
+    with open(path, 'w', encoding='utf-8') as file:
         file.write(text)
-    return file_path
+    return path
 
 def main():
-    load_dotenv()
-    st.set_page_config(page_title="Your own AI chat",
-                       page_icon="👋")
+    # load_dotenv()
+    # st.set_page_config(page_title="Your own AI chat",
+    #                    page_icon="👋")
 
     st.write(css, unsafe_allow_html=True)
 
@@ -51,9 +53,7 @@ def main():
                 api_url = SERVER_URL+'/api/chats/'
                 # get pdf text and save to .txt
                 raw_text = get_pdf_text(pdf_doc)
-                file_url = save_text_to_file(raw_text, file_path + store_name + '.txt')
-                file_url = os.path.join(root_directory, file_url)
-                # st.write(file_url)
+                file_url = save_text_to_file(raw_text, full_path + store_name + '.txt')
 
                 data = {
                     "title_chat": f"{store_name}",
