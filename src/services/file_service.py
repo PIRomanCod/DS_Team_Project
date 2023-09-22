@@ -3,7 +3,9 @@ import pickle
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import HuggingFaceInstructEmbeddings, OpenAIEmbeddings
 from langchain.vectorstores import FAISS
+from dotenv import load_dotenv
 
+load_dotenv()
 
 async def before_chat_insert(file_content):
     with open(file_content, "r", encoding="utf-8") as file:
