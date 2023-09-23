@@ -1,19 +1,7 @@
-# from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseSettings
-#
-# from pydantic import (
-#     AliasChoices,
-#     AmqpDsn,
-#     BaseModel,
-#     Field,
-#     ImportString,
-#     PostgresDsn,
-#     RedisDsn,
-# )
 
 
 class Settings(BaseSettings):
-    # model_config = SettingsConfigDict(env_prefix='')
     sqlalchemy_database_url: str = 'postgresql+psycopg2://user:password@localhost:5432/postgres'
     secret_key: str = 'secret_key'
     algorithm: str = 'HS256'

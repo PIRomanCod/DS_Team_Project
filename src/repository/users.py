@@ -14,19 +14,17 @@ async def get_user_by_email(email: str, db: Session) -> User | None:
     :param email: str: Specify the email of the user we want to get from our database
     :param db: Session: Pass the database session to the function
     :return: A user object or none if no user with the given email exists
-    :doc-author: Trelent
     """
     return db.query(User).filter_by(email=email).first()
 
 
-async def create_user(body: UserModel, db: Session):
+async def create_user(body: UserModel, db: Session) -> User:
     """
     The create_user function creates a new user in the database.
 
     :param body: UserModel: Create a new user object
     :param db: Session: Pass the database session to the function
     :return: A user object
-    :doc-author: Trelent
     """
     g = Gravatar(body.email)
 
@@ -37,7 +35,7 @@ async def create_user(body: UserModel, db: Session):
     return new_user
 
 
-async def update_token(user: User, refresh_token, db: Session):
+async def update_token(user: User, refresh_token, db: Session) -> User:
     """
     The update_token function updates the refresh token for a user in the database.
         Args:
@@ -49,14 +47,13 @@ async def update_token(user: User, refresh_token, db: Session):
     :param refresh_token: Update the user's refresh_token in the database
     :param db: Session: Update the database with the new refresh token
     :return: The user object with the updated refresh_token
-    :doc-author: Trelent
     """
     user.refresh_token = refresh_token
     db.commit()
     return user
 
 
-async def confirmed_email(email: str, db: Session) -> None:
+async def confirmed_email(email: str, db: Session) -> User:
     """
     The confirmed_email function takes in an email and a database session,
     and sets the confirmed field of the user with that email to True.
@@ -65,7 +62,6 @@ async def confirmed_email(email: str, db: Session) -> None:
     :param email: str: Specify the email address of the user to be confirmed
     :param db: Session: Pass the database session to the function
     :return: Nothing
-    :doc-author: Trelent
     """
     user = await get_user_by_email(email, db)
     user.confirmed = True
@@ -81,7 +77,6 @@ async def update_avatar(email, url: str, db: Session) -> User:
     :param url: str: Specify the type of data that will be passed in
     :param db: Session: Pass the database session to the function
     :return: The updated user
-    :doc-author: Trelent
     """
     user = await get_user_by_email(email, db)
     user.avatar = url
@@ -89,7 +84,7 @@ async def update_avatar(email, url: str, db: Session) -> User:
     return user
 
 
-async def update_password(user: User, new_password: str, db: Session) -> None:
+async def update_password(user: User, new_password: str, db: Session) -> User:
     """
     The update_password function takes in a user object, a new password string, and the database session.
     It then updates the user's password to be equal to the new_password string.
@@ -99,14 +94,13 @@ async def update_password(user: User, new_password: str, db: Session) -> None:
     :param new_password: str: Pass the new password to the function
     :param db: Session: Pass the database session to the function
     :return: None
-    :doc-author: Trelent
     """
     user.password = new_password
     db.commit()
     return user
 
 
-async def update_reset_token(user: User, reset_token, db: Session) -> None:
+async def update_reset_token(user: User, reset_token, db: Session) -> User:
     """
     The update_reset_token function updates the password reset token for a user.
 
@@ -114,7 +108,6 @@ async def update_reset_token(user: User, reset_token, db: Session) -> None:
     :param reset_token: Update the password_reset_token field in the user table
     :param db: Session: Pass the database session to the function
     :return: None
-    :doc-author: Trelent
     """
     user.password_reset_token = reset_token
     db.commit()

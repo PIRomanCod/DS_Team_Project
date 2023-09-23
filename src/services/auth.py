@@ -129,23 +129,11 @@ class Auth:
             user = await repository_users.get_user_by_email(email, db)
             if user is None:
                 raise credentials_exception
-            self.r.set(f"user:{email}", pickle.dumps(user))
-            self.r.expire(f"user:{email}", 900)
+            self.r.set(f"user:{email}", pickle.dumps(user)) # noqa
+            self.r.expire(f"user:{email}", 900) # noqa
         else:
-            user = pickle.loads(user)
-    # #
-    # #     # user = await repository_users.get_user_by_email(email, db)
-    # #     # if user is None:
-    # #     #     raise credentials_exception
-    # #     #     self.r.set(f"user:{email}", pickle.dumps(user))
-    # #     #     self.r.expire(f"user:{email}", 900)
-    # #     return user
-    #
-    # #
-    #     user = await repository_users.get_user_by_email(email, db)
-    #     if user is None:
-    #         raise credentials_exception
-    # #
+            user = pickle.loads(user) # noqa
+
         return user
 
     async def decode_refresh_token(self, refresh_token: str):

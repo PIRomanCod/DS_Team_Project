@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 
 from src.database.db import get_db
-from src.routes import auth, users, chats, chathistory, chat_service
+from src.routes import auth, users, chats, chathistory
 
 app = FastAPI()
 
@@ -55,7 +55,6 @@ async def errors_handling(request: Request, call_next):
 
 
 templates = Jinja2Templates(directory='templates')
-# app.mount("/static", StaticFiles(directory="static"), name="static")
 BASE_DIR = pathlib.Path(__file__).parent
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
@@ -95,12 +94,10 @@ def healthchecker(db: Session = Depends(get_db)):
 
 
 app.include_router(auth.router)
-# app.include_router(contacts.router)
-# app.include_router(search.search)
 app.include_router(users.router)
 app.include_router(chats.router, prefix='/api')
 app.include_router(chathistory.router, prefix='/api')
-# app.include_router(chat_service.router, prefix='/api')
+
 
 @app.on_event("startup")
 async def startup():
