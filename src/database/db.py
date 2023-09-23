@@ -19,7 +19,6 @@ def get_db():
     It also handles any exceptions that occur during the request, rolling back any changes to the database if an exception occurs.
 
     :return: A database connection from the pool
-    :doc-author: Trelent
     """
     db = DBSession()
     try:

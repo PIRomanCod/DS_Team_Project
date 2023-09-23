@@ -1,9 +1,9 @@
-from typing import List
-
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, func, desc
+from sqlalchemy import and_
+import ast
 
-from src.database.models import User, ChatHistory, Chat, Role
+
+from src.database.models import User, ChatHistory
 from src.schemas import ChatHistoryBase
 from src.services.chat_service import get_context, get_conversation_chain
 
@@ -19,51 +19,23 @@ async def create_message(chat_id: int, body: ChatHistoryBase, db: Session, user:
     """
     context = await get_context(chat_id, db, user)
     answer = get_conversation_chain(body.message, context)
-    new_chat_history = ChatHistory(message=answer, user_id=user.id, chat_id=chat_id)
+
+    response_dict = ast.literal_eval(answer)
+    user_question = 'Q: ' + response_dict['user_messages'][0]
+    bot_response = 'A: '+ response_dict['bot_messages'][0]
+
+    question = ChatHistory(message=user_question, user_id=user.id, chat_id=chat_id)
+    response = ChatHistory(message=bot_response, user_id=user.id, chat_id=chat_id)
     # new_chat_history = ChatHistory(message=body.message, user_id=user.id, chat_id=chat_id)
-    db.add(new_chat_history)
+    db.add(question)
+    db.add(response)
+
     db.commit()
-    db.refresh(new_chat_history)
-    return new_chat_history
+    db.refresh(response)
+    return response
 
 
-# async def update_chat(chat_id: int, body: ChatBase, db: Session, user: User) -> Chat | None:
-#     """
-#     The **update_chat** function allows a user to edit their own chat.
-#
-#     :param chat_id: int: Find the chat in the database
-#     :param body: ChatBase: Pass the data from the request body to this function
-#     :param db: Session: Connect to the database
-#     :param user: User: Check if the user is an admin, moderator or the author of the chat
-#     :return: A chat object
-#     """
-#     chat = db.query(Chat).filter(Chat.id == chat_id).first()
-#     if chat:
-#         if user.roles in [Role.admin, Role.moderator] or chat.user_id == user.id:
-#             chat.chat = body.chat
-#             chat.updated_at = func.now()
-#             db.commit()
-#     return chat
-
-
-# async def delete_chat(chat_id: int, db: Session, user: User) -> None:
-#     """
-#     The **delete_chat** function deletes a chat from the database. The chat can be deleted by Admin and Moderator #my own chat????
-#
-#     :param chat_id: int: Identify the chat to be deleted
-#     :param db: Session: Connect to the database
-#     :param user: User: Check if the user is Admin or Moderator and authorized to delete a chat
-#     :return: The chat that was deleted
-#     """
-#     chat = db.query(Chat).filter(Chat.id == chat_id).first()
-#     if chat:
-#         if user.roles in [Role.admin, Role.moderator] or chat.user_id == user.id:
-#             db.delete(chat)
-#             db.commit()
-#     return chat
-
-
-async def get_history_by_chat(chat_id: int, db: Session):
+async def get_history_by_chat(chat_id: int, db: Session) -> ChatHistory:
     """
     The **get_history_by_chat** function returns a history from the database by chat_id and user.
 

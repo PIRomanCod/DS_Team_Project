@@ -1,20 +1,23 @@
-import streamlit as st
-import requests
-import json
 import pickle
-from dotenv import load_dotenv
+
 import langchain
+import requests
+import streamlit as st
+from dotenv import load_dotenv
 
-from pages.src.auth_services import SERVER_URL, FILE_NAME, load_token, save_token
-from src.conf.config import settings
-from htmlTemplates import css, bot_template, user_template
-
+from pages.src.auth_services import SERVER_URL, FILE_NAME
 
 langchain.verbose = False
 
 
-# function for receiving a list of chats from the server
 def get_chat_list():
+    """
+    The get_chat_list function returns a list of all the chats that the user is currently in.
+    The function makes a GET request to /api/chats, which returns an array of chat objects.
+    Each chat object contains information about the chat, including its id and name.
+
+    :return: A list of chats
+    """
     api_url = SERVER_URL + "/api/chats"
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -27,8 +30,15 @@ def get_chat_list():
         return []
 
 
-# function for creating a question for the chat
 def create_message(chat_id, message):
+    """
+    The create_message function takes in a chat_id and message, then creates a new message
+    in the database. It returns the response from the server.
+
+    :param chat_id: Identify the chat
+    :param message: Pass the message to be sent
+    :return: A dictionary with the following keys:
+    """
     api_url = SERVER_URL + f"/api/history/{chat_id}"
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -37,13 +47,19 @@ def create_message(chat_id, message):
     data = {"message": message}
     response = requests.post(api_url, json=data, headers=headers)
     if response.status_code == 201:
-        return response.json()#["response"]
+        return response.json()
     else:
         return "Error creating question"
 
-      
-# func for write message history under chat
+
 def get_history(chat_id):
+    """
+    The get_history function takes a chat_id as an argument and returns the history of that chat.
+    It does this by making a GET request to the /api/history/.
+
+    :param chat_id: Get the history of a specific chat
+    :return: A list of messages in the chat
+    """
     api_url = SERVER_URL + f"/api/history/{chat_id}"
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -51,19 +67,23 @@ def get_history(chat_id):
     }
     response = requests.get(api_url, headers=headers)
     if response.status_code == 200:
-        st.write("Chat's history: ")
+        st.write("In previous episodes...: ")
         return [item["message"] for item in response.json()]
     else:
         st.write("Chat's history: ")
         return "It's empty"
 
+
 # main funk  Streamlit
 def main():
-    # st.set_page_config(page_title="Your own AI chat",
-    #                    page_icon=":sunglasses:")
-    #
-    # st.write(css, unsafe_allow_html=True)
 
+    """
+    The main function is the entry point for the module.
+    It creates a list of chats from which to select, and then displays
+    the chat history and allows users to ask questions about their documents.
+
+    :return: A list of chats
+    """
     st.title("Exist chats")
 
     # get list of chats from the server
@@ -87,14 +107,14 @@ def main():
 
     if selected_chat_id is not None:
 
-
         # Enter text for a question
         user_question = st.text_input("Ask a question about your documents:")
 
         # Button to create a question and receive an answer
         if st.button("Send a question"):
             response = create_message(selected_chat_id, user_question)
-            st.write(f"Bot's answer: {response}")
+            st.write(f"Your question: {user_question}")
+            st.write(f"Bot's answer: {response['message']}")
 
 
 if __name__ == "__main__":
@@ -103,4 +123,3 @@ if __name__ == "__main__":
         access_token, refresh_token = pickle.load(fh)
 
     main()
-

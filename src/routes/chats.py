@@ -1,21 +1,21 @@
-from fastapi import APIRouter, HTTPException, Depends, status, Request, Query
-from sqlalchemy.orm import Session
 from typing import List
 
-from src.database.db import get_db
-from src.schemas import ChatBase, ChatUpdate, ChatModel
-from src.repository import chats as repository_chats
-from src.services.auth import auth_service
+from fastapi import APIRouter, HTTPException, Depends, status, Query
+from sqlalchemy.orm import Session
+
 from src.conf import messages
-from src.services.role import RoleAccess
+from src.database.db import get_db
 from src.database.models import User, Role
+from src.repository import chats as repository_chats
+from src.schemas import ChatBase, ChatModel
+from src.services.auth import auth_service
+from src.services.role import RoleAccess
 
 router = APIRouter(prefix='/chats', tags=["chats"])
 
-allowed_get_chats = RoleAccess([Role.admin, Role.moderator, Role.user])
-allowed_add_chats = RoleAccess([Role.admin, Role.moderator, Role.user])
-allowed_edit_chats = RoleAccess([Role.admin, Role.moderator, Role.user])
-allowed_delete_chats = RoleAccess([Role.admin, Role.moderator, Role.user])
+allowed_get_chats = RoleAccess([Role.admin, Role.moderator, Role.user])  # noqa
+allowed_add_chats = RoleAccess([Role.admin, Role.moderator, Role.user])  # noqa
+allowed_delete_chats = RoleAccess([Role.admin, Role.moderator, Role.user])  # noqa
 
 
 @router.post("/", response_model=ChatModel, status_code=status.HTTP_201_CREATED,
@@ -36,8 +36,8 @@ async def create_chat(body: ChatBase, db: Session = Depends(get_db),
 @router.get("/", response_model=List[ChatModel], status_code=status.HTTP_200_OK,
             dependencies=[Depends(allowed_get_chats)])
 async def get_chats(limit: int = Query(10, le=50), offset: int = 0,
-                     current_user: User = Depends(auth_service.get_current_user),
-                     db: Session = Depends(get_db)):
+                    current_user: User = Depends(auth_service.get_current_user),
+                    db: Session = Depends(get_db)):
     """
     The **get_chats** function gets all the chats from the database.
 
@@ -68,24 +68,6 @@ async def get_chat(chat_id: int, db: Session = Depends(get_db),
     if chat is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.CHAT_NOT_FOUND)
     return chat
-
-
-@router.put("/{chat_id}", response_model=ChatUpdate, dependencies=[Depends(allowed_edit_chats)])
-async def update_chat(chat_id: int, body: ChatBase, db: Session = Depends(get_db),
-                      current_user: User = Depends(auth_service.get_current_user)):
-    """
-    The **update_chat** function allows a user to edit their own chat.
-
-    :param chat_id: int: Identify the chat to be edited
-    :param body: ChatBase: Pass the chat body to the update_chat function
-    :param db: Session: Get the database session
-    :param current_user: User: Get the user who is currently logged-in
-    :return: None, but the function expects a ChatBase object
-    """
-    updated_chat = await repository_chats.update_chat(chat_id, body, db, current_user)
-    if updated_chat is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.CHAT_NOT_FOUND)
-    return updated_chat
 
 
 @router.delete("/{chat_id}", response_model=ChatModel,

@@ -17,3 +17,5 @@ VERIFICATION_ERROR = "Verification error"
 
 CHAT_NOT_FOUND = "Chat not found"
 NOT_FOUND = "Not Found"
+
+FORBIDDEN = 'Operation forbidden'

@@ -1,28 +1,20 @@
-from typing import List
-
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, func, desc
+from sqlalchemy import and_, desc
 
 from src.database.models import User, Chat, Role
 from src.schemas import ChatBase
-
-import requests
-
-from src.services.file_service import before_chat_insert
 
 
 async def create_chat(body: ChatBase, db: Session, user: User) -> Chat:
     """
     The **create_chat** function adds a new chat to the database.
 
+    :param body: ChatBase: Get the title_chat and file_url from the request body
     :param db: Session: Access the database
     :param user: User: Get the user_id from the logged-in user
     :return: A chat object
     """
-    # response = body.file_url
     context = True
-    # context = await before_chat_insert(body.file_url)
-    # print(context)
 
     new_chat = Chat(title_chat=body.title_chat, chat_data=context, file_url=body.file_url, user_id=user.id)
     # new_chat = Chat(title_chat=body.title_chat, file_url=body.file_url, user_id=user.id)
@@ -32,26 +24,7 @@ async def create_chat(body: ChatBase, db: Session, user: User) -> Chat:
     return new_chat
 
 
-async def update_chat(chat_id: int, body: ChatBase, db: Session, user: User) -> Chat | None:
-    """
-    The **update_chat** function allows a user to edit their own chat.
-
-    :param chat_id: int: Find the chat in the database
-    :param body: ChatBase: Pass the data from the request body to this function
-    :param db: Session: Connect to the database
-    :param user: User: Check if the user is an admin, moderator or the author of the chat
-    :return: A chat object
-    """
-    chat = db.query(Chat).filter(Chat.id == chat_id).first()
-    if chat:
-        if user.roles in [Role.admin, Role.moderator] or chat.user_id == user.id:
-            chat.title_chat = body.title_chat
-            chat.updated_at = func.now()
-            db.commit()
-    return chat
-
-
-async def delete_chat(chat_id: int, db: Session, user: User) -> None:
+async def delete_chat(chat_id: int, db: Session, user: User) -> Chat | None:
     """
     The **delete_chat** function deletes a chat from the database. The chat can be deleted by Admin and Moderator #my own chat????
 
@@ -80,7 +53,7 @@ async def get_chat_by_id(chat_id: int, db: Session, user: User) -> Chat | None:
     return db.query(Chat).filter(and_(Chat.id == chat_id, Chat.user_id == user.id)).first()
 
 
-async def get_chats(limit: int, offset: int, user: User, db: Session):
+async def get_chats(limit: int, offset: int, user: User, db: Session) -> list | None:
     """
     The **get_chats** function gets all the chats from the database.
 
