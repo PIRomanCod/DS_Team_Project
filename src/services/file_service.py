@@ -1,8 +1,8 @@
-import pickle
+# import pickle
 
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import HuggingFaceInstructEmbeddings, OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+# from langchain.embeddings import HuggingFaceInstructEmbeddings, OpenAIEmbeddings
+# from langchain.vectorstores import FAISS
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,14 +18,13 @@ async def before_chat_insert(file_content):
     )
     chunks = text_splitter.split_text(text)
 
-    embeddings = OpenAIEmbeddings()
-    # embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
+    # embeddings = OpenAIEmbeddings()
+    # # embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
+    #
+    # vectorstore = FAISS.from_texts(texts=chunks, embedding=embeddings)
+    # # vectorstore = Bagel.from_texts(cluster_name="testing", texts=text_chunks, embedding=embeddings)
+    # context = pickle.dumps(vectorstore)
 
-    vectorstore = FAISS.from_texts(texts=chunks, embedding=embeddings)
-    # vectorstore = Bagel.from_texts(cluster_name="testing", texts=text_chunks, embedding=embeddings)
-    context = pickle.dumps(vectorstore)
-
-    return context
-
-
+    return chunks
+    # return context
 

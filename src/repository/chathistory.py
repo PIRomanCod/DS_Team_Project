@@ -5,6 +5,7 @@ from sqlalchemy import and_, func, desc
 
 from src.database.models import User, ChatHistory, Chat, Role
 from src.schemas import ChatHistoryBase
+from src.services.chat_service import get_context, get_conversation_chain
 
 
 async def create_message(chat_id: int, body: ChatHistoryBase, db: Session, user: User) -> ChatHistory:
@@ -16,7 +17,10 @@ async def create_message(chat_id: int, body: ChatHistoryBase, db: Session, user:
     :param chat: Chat: Get the chat_id
     :return: A new chat_history object
     """
-    new_chat_history = ChatHistory(message=body.message, user_id=user.id, chat_id=chat_id)
+    context = await get_context(chat_id, db, user)
+    answer = get_conversation_chain(body.message, context)
+    new_chat_history = ChatHistory(message=answer, user_id=user.id, chat_id=chat_id)
+    # new_chat_history = ChatHistory(message=body.message, user_id=user.id, chat_id=chat_id)
     db.add(new_chat_history)
     db.commit()
     db.refresh(new_chat_history)

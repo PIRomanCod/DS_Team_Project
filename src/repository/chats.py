@@ -20,10 +20,11 @@ async def create_chat(body: ChatBase, db: Session, user: User) -> Chat:
     :return: A chat object
     """
     # response = body.file_url
-    llm_state = await before_chat_insert(body.file_url)
+    context = True
+    # context = await before_chat_insert(body.file_url)
+    # print(context)
 
-    new_chat = Chat(title_chat=body.title_chat, chat_data=llm_state, file_url=body.file_url, user_id=user.id)
-    # else:
+    new_chat = Chat(title_chat=body.title_chat, chat_data=context, file_url=body.file_url, user_id=user.id)
     # new_chat = Chat(title_chat=body.title_chat, file_url=body.file_url, user_id=user.id)
     db.add(new_chat)
     db.commit()
