@@ -30,6 +30,26 @@ def get_chat_list():
         return []
 
 
+def delete_chat(chat_id):
+    """
+    The delete_chat function takes in a chat_id and deletes the chat from the database.
+        It returns an error message if the chat is not found, or a success message if it is.
+
+    :param chat_id: Specify which chat to delete
+    :return: A response object
+    """
+    api_url = SERVER_URL + f"/api/chats/{chat_id}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.delete(api_url, headers=headers)
+    if response.status_code == 404:
+        st.warning("Chat not found.")
+    else:
+        st.error("Chat deleted successfully.")
+
+
 def create_message(chat_id, message):
     """
     The create_message function takes in a chat_id and message, then creates a new message
@@ -97,6 +117,11 @@ def main():
     for chat in chat_list:
         if chat["title_chat"] == selected_chat_index:
             selected_chat_id = chat["id"]
+
+            if st.button("Delete Chat"):
+                if selected_chat_id:
+                    delete_chat(selected_chat_id)
+
             if chat["chat_data"]:
                 st.write("Chat has context, you can continue")
             else:
