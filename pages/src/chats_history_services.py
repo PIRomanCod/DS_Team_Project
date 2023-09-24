@@ -71,3 +71,19 @@ def get_history(chat_id, acc_token):
     response = requests.get(api_url, headers=headers)
     return response
 
+
+def delete_chat(chat_id, access_token):
+    """
+    The delete_chat function takes in a chat_id and deletes the chat from the database.
+        It returns an error message if the chat is not found, or a success message if it is.
+
+    :param chat_id: Specify which chat to delete
+    :return: A response object
+    """
+    api_url = SERVER_URL + f"/api/chats/{chat_id}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.delete(api_url, headers=headers)
+    return response

@@ -5,31 +5,19 @@ import streamlit as st
 from dotenv import load_dotenv
 
 from pages.src.auth_services import FILE_NAME
-from pages.src.chats_history_services import get_chat_list, create_message, get_history
+from pages.src.chats_history_services import get_chat_list, create_message, get_history, delete_chat
 
 langchain.verbose = False
 
-def delete_chat(chat_id):
-    """
-    The delete_chat function takes in a chat_id and deletes the chat from the database.
-        It returns an error message if the chat is not found, or a success message if it is.
 
-    :param chat_id: Specify which chat to delete
-    :return: A response object
-    """
-    api_url = SERVER_URL + f"/api/chats/{chat_id}"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        'Content-Type': 'application/json'
-    }
-    response = requests.delete(api_url, headers=headers)
-    if response.status_code == 404:
-        st.warning("Chat not found.")
-    else:
-        st.error("Chat deleted successfully.")
-
-        
 def get_chat_history(chat_id):
+    """
+    The get_chat_history function takes a chat_id as an argument and returns the history of that chat.
+
+    :param chat_id: Get the chat's history
+    :return: A list of messages, so we can print them out
+    :doc-author: Trelent
+    """
     res = get_history(chat_id, access_token)
     if res.status_code == 200:
         st.write("In previous episodes...: ")
@@ -37,6 +25,23 @@ def get_chat_history(chat_id):
     else:
         st.write("Chat's history: ")
         return "It's empty"
+
+
+def delete_chat_history(chat_id):
+    """
+    The delete_chat_history function deletes the chat history of a given chat.
+        Args:
+            chat_id (str): The id of the chat to delete.
+
+    :param chat_id: Identify the chat to be deleted
+    :return: A response object
+    :doc-author: Trelent
+    """
+    res = delete_chat(chat_id, access_token)
+    if res.status_code == 404:
+        st.warning("Chat not found.")
+    else:
+        st.error("Chat deleted successfully.")
 
 
 # main funk  Streamlit
@@ -64,7 +69,7 @@ def main():
 
             if st.button("Delete Chat"):
                 if selected_chat_id:
-                    delete_chat(selected_chat_id)
+                    delete_chat_history(selected_chat_id)
 
             if chat["chat_data"]:
                 st.write("Chat has context, you can continue")
