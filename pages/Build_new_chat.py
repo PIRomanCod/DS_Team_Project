@@ -14,7 +14,6 @@ from src.conf.config import settings
 data_directory = settings.data_folder
 root_directory = settings.root_directory
 full_path = os.path.join(root_directory, data_directory)
-#st.write("This message for cheking where are you try to save", full_path)
 
 load_dotenv()
 

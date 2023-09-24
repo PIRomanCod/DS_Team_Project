@@ -1,6 +1,7 @@
 import streamlit as st
 from htmlTemplates import css, bot_template, user_template
 
+
 def main():
     st.set_page_config(page_title="Your own AI chat",
                        page_icon="👋")

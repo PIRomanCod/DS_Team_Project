@@ -1,0 +1,117 @@
+Mathematical Programming Lecture 16
+OR 630 Fall 2006 October 19, 2006
+Scribe: Collin Chan
+In this lecture, we consider the 1-dimensional cutting-stock problem. Column generation and
+dynamic programming are discussed while we solve the problem.
+1 The One-Dimensional Cutting Stock Problem
+1.1 Some recap from last class / one way of formulating the problem
+Consider the problem of minimizing the number of rolls of paper (each with length W) needed to
+produce bkrolls with length skfork= 1;2; :::; m where 0 ·sk·Wfor each k. A clear upper-
+bound for this problem isPm
+k=1bk=N(i.e., using one complete roll of paper to produce each one
+of the rolls needed).
+Using yi2 f0;1g,i= 1;2; :::; N to denote whether or not the i-th roll is used in a solution and
+xij2 f0;1g,j= 1;2; :::; N to denote whether or not the j-th desired roll (with length wj2 fsk:
+k= 1; :::; mg) is obtained from the i-th complete roll, we may formulate the integer programming
+problem as:
+minPN
+i=1yi
+s.t. (1):PN
+j=1xijwj·Wfori= 1; : : : ; N (maximum available per roll)
+(2):PN
+i=1xij= 1 for j= 1; : : : ; N (all demands must be satis¯ed)
+(3): 0 ·xij·yi8i; j(must cut from a complete roll which is used)
+(4):xij; yiintegers :
+If we drop the \integer-valued" requirement in (4), we get an LP relaxation of the original problem
+which we can solve to get a lower bound for the IP. Unfortunately, the lower bound obtained is
+almost useless. The existence of the feasible solution xij=yi= 1=N8i; jimplies the optimal
+solution we get will always be smaller than or equal to 1.
+We can improve this somewhat by changing (1) to (1'):PN
+j=1xijwj·Wyifor all i (where the
+RHS represents the fraction of each complete roll we actually use). However, even this formulation
+is not great. One can show that the optimal value of the LP relaxation is merelyPm
+k=1bksk=W
+(a fairly natural lower bound which one could compute without solving an LP!). Heuristically, one
+can make an improvement by starting with a good solution (which possibly does not make use of
+all N rolls).
+Of course, the quality of the bound produced by the LP relaxation is not the only factor in how
+e®ective a formulation is within a branch-and-bound code. Another factor is the extent to which
+solutions are represented multiple times, since then bad fractional solutions have to be ruled out
+multiple times within the search. The above formulation is particularly bad in this respect.
+11.2 An alternate formulation
+We switch our attention to one complete roll with length W. We use a column vector Ajto represent
+a feasible cutting pattern pj. The i-th component of Aj(aij) corresponds to the number of pieces
+of length sicut in one roll of con¯guration pj. For pjto be a feasible cutting pattern, the elements
+ofAjmust all be non-negative integers and the sum of them must be ·W(Pm
+i=1aij·W).
+Taking W= 10, s1= 5, s2= 3 and s3= 2 as an example, it is easy to verify that the set of all
+feasible cutting patterns (expressed in rows) is
+f(2;0;0);(1;1;1);(0;3;0);(1;0;2);(0;0;5);(0;1;3);(0;2;2);(1;0;2)g=Aunion with all possible
+subsets of each of the elements of A. (Aside: Note that the set Aconsists only of cutting patterns
+that could not ¯t any more rolls with one of the required lengths. We call these cutting patterns
+\maximal". Any subset of an element of Awill however have enough space to ¯t one or more rolls
+with one of the required lengths.) Let nbe the total number of distinct feasible cutting patterns
+(that is, the number of vectors Ajsatisfying the constraints) and let xjdenote the number of rolls
+cut according to the j-th pattern. We may now formulate the 1-dimensional cutting stock problem
+as the following IP:
+minPn
+j=1xj
+s.t.Pn
+j=1aijxj¸bifori= 1; : : : ; m (demand constraint)
+xj¸0 integer-valued
+Solving the LP-relaxation will give us another lower bound for the IP. Recall that since there are
+onlymconstraints, there are at most mnon-zero variables. Given the LP-solution, we may round
+up decision variables with fractional values to the next integer and conclude that IP-optimal ·
+LP-optimal + m . (Note that an IP which has ¸replaced by = in the constraints above but
+otherwise remains the same is also valid. But the ¸format meshes well with the situation where
+we only use \maximal" cutting patterns.)
+1.3 Column Generation
+With the possibility that nis very large, it can be very di±cult to solve the LP directly. This leads
+us to the idea of column generation. We restrict ourselves to a few patterns and generate new ones
+as needed. We hope that the number of iterations depends on mbut not nhere.
+To run revised simplex on this LP using column generation, we need to be able to:
+(1) ¯nd an initial basis, and
+(2) algorithmically determine if all non-basic columns have reduced cost ¸0; and if not, ¯nd a
+column with negative reduced cost.
+It is not di±cult to ¯nd an initial basic feasible solution for this problem. Consider the set of
+column vectors fAjg1·j·mwhere aij=bW=s jcifi=jand 0 otherwise. Using this as a basis, we
+get the basic feasible solution xj=bjforj= 1; :::; m and 0 otherwise.
+We now consider how to generate new patterns (i.e., how to ¯nd a non-basic column whose reduced
+cost is negative.) Given any basic feasible solution, we can obtain the corresponding dual solution
+easily by solving yAB=cB. The reduced cost associated with an arbitrary cutting pattern pjis
+equal to cj¡yAj= 1¡yAj. Consider the auxiliary optimization problem:
+2maxPm
+i=1yiai
+s.t.Pm
+i=1siai·W
+ai¸0;integer-valued 8i
+This problem is referred to as the integer knapsack problem. With the discussion above, one can
+see that any feasible solution for the auxiliary problem corresponds to a feasible cutting pattern in
+the cutting-stock problem.
+Lemma 1 There exists a negative reduced cost column (in the cutting-stock problem) if and only if
+the optimal value to this auxiliary IP is >1. The optimal solution gives a column whose associated
+reduced cost is <0.
+Proof: As mentioned, any feasible solution to the integer knapsack problem corresponds to a feasi-
+ble cutting pattern in the cutting-stock problem. If the optimal solution for the knapsack problem
+is>1 , its reduced cost would be equal to 1 ¡Pm
+i=1yiai<0. Hence we may enter this column into
+the basis (in the cutting stock problem). If the integer knapsack problem has an optimal solution
+·1, all the reduced costs are non-negative and we may conclude that we have an optimal solution
+for the cutting-stock problem.
+1.4 Dynamic Programming
+The last thing we need to consider is how to solve the integer knapsack problem. One approach is
+via dynamic programming. Because the units used in length measurements can be scaled, we may
+assume that si,i= 1; :::; m andWare integers without loss of generality.
+LetFi(v) denote the maximum value obtained from the integer knapsack problem where Wis
+replaced by vandmis replaced by iabove. The ultimate goal here is to ¯nd out what Fm(W)
+is. We ¯rst try to write an expression for Fi(v). Given a roll of paper with length v, we start by
+cutting rolls with length sifrom it. The number of rolls with length sione could get is any integer
+aibetween 0 and bv=sic. Fixing ai, we then try to cut rolls with lengths sk,k= 1; :::; i¡1 optimally
+from the v¡aisiwhich remains. Therefore, we can express Fi(v) using the following equation:
+Fi(v) = max ai=0;:::;bv=sic(0;yiai+Fi¡1(v¡siai))
+This gives a recursive relationship that links Fiwith Fi¡1. Because it is very easy to compute F1(v)
+(F1(v) =yibv=sicifyi¸0 and 0 otherwise), we have a way of computing Fm(W). In each iteration
+i, compute Fifor all v. These values depend only on the input data and the values of Fi¡1already
+computed. By storing the maximization of each entry, we may backwards construct the optimal
+solution we need (the cutting pattern with the most negative reduced cost).
+3
