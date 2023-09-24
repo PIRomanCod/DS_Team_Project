@@ -9,18 +9,27 @@ from pages.src.chats_history_services import get_chat_list, create_message, get_
 
 langchain.verbose = False
 
+def delete_chat(chat_id):
+    """
+    The delete_chat function takes in a chat_id and deletes the chat from the database.
+        It returns an error message if the chat is not found, or a success message if it is.
 
+    :param chat_id: Specify which chat to delete
+    :return: A response object
+    """
+    api_url = SERVER_URL + f"/api/chats/{chat_id}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.delete(api_url, headers=headers)
+    if response.status_code == 404:
+        st.warning("Chat not found.")
+    else:
+        st.error("Chat deleted successfully.")
+
+        
 def get_chat_history(chat_id):
-
-    """
-    The get_chat_history function takes a chat_id as an argument and returns the history of that chat.
-        The function uses the get_history function from the vk_api module to retrieve a list of messages in JSON format.
-        If there is no error, it returns a list with all messages in that chat; otherwise, it returns &quot;It's empty;.
-
-    :param chat_id: Get the chat's history
-    :return: A list of messages
-    :doc-author: Trelent
-    """
     res = get_history(chat_id, access_token)
     if res.status_code == 200:
         st.write("In previous episodes...: ")
@@ -52,6 +61,11 @@ def main():
     for chat in chat_list:
         if chat["title_chat"] == selected_chat_index:
             selected_chat_id = chat["id"]
+
+            if st.button("Delete Chat"):
+                if selected_chat_id:
+                    delete_chat(selected_chat_id)
+
             if chat["chat_data"]:
                 st.write("Chat has context, you can continue")
             else:
