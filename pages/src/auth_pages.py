@@ -8,6 +8,13 @@ IMG_TYPE = ['png', 'jpg', 'jpeg', 'gif', 'svg']
 
 
 def login_page():
+    """
+    The login_page function is the first page of the app. It allows users to login with their Spotify credentials.
+    If they are successful, it returns a tuple containing an access token and refresh token for use in other functions.
+
+    :return: A tuple of access_token and refresh_token
+    :doc-author: Trelent
+    """
     acc_token, ref_token = None, None
     st.title("Login")
     username = st.text_input("Email")
@@ -27,6 +34,17 @@ def login_page():
 
 
 def change_avatar_page(acc_token, ref_token):
+    """
+    The change_avatar_page function is used to change the avatar of a user.
+    It takes two parameters: acc_token and ref_token.
+    The function first checks if there is an image uploaded by the user, then it processes it using set_avatar()
+     function from api.py file.
+
+    :param acc_token: Access the user's account
+    :param ref_token: Get a new access token
+    :return: The set_avatar function
+    :doc-author: Trelent
+    """
     new_avatar = st.file_uploader("Upload your image here and click on 'Process'", type=IMG_TYPE)
     if new_avatar:
         if st.button("Process"):
@@ -39,6 +57,14 @@ def change_avatar_page(acc_token, ref_token):
 
 
 def request_mail_page():
+    """
+    The request_mail_page function is used to resend the email signup confirmation.
+    The user enters their email address and clicks the &quot;Request Email&quot; button.
+    If successful, a success message will appear.
+
+    :return: A success message if the email request is successful
+    :doc-author: Trelent
+    """
     st.title("Resending email signup confirmation")
     email_reset = st.text_input("Email request")
     if st.button("Request email"):
@@ -47,6 +73,13 @@ def request_mail_page():
 
 
 def reset_password_page():
+    """
+    The reset_password_page function is used to reset a user's password.
+        The function takes no arguments and returns nothing.
+
+    :return: A string
+    :doc-author: Trelent
+    """
     st.title("Reset password via email")
     email_reset = st.text_input("Email for reset password")
     if st.button("Reset password"):
@@ -67,10 +100,27 @@ def reset_password_page():
 
 
 def start_page():
+    """
+    The start_page function is used to display the title of the page.
+
+    :return: The start page of the app
+    :doc-author: Trelent
+    """
     st.title("Login for use all features")
 
 
 def profile_page(acc_token, ref_token):
+    """
+    The profile_page function is used to display the user's profile information.
+    It takes in two parameters: acc_token and ref_token, which are both strings.
+    The function uses the get_user_info function to retrieve a dictionary of user info from Spotify's API.
+    If this succeeds, it displays the username, email address and avatar image for that user.
+
+    :param acc_token: Get the user information
+    :param ref_token: Get a new access token
+    :return: The user information
+    :doc-author: Trelent
+    """
     st.title("My profile")
     user_info = get_user_info(acc_token, ref_token)
     if user_info:
@@ -82,6 +132,14 @@ def profile_page(acc_token, ref_token):
 
 
 def signup_page():
+    """
+    The signup_page function is used to create a new user account.
+    It takes no arguments and returns nothing.
+
+
+    :return: A dictionary with the id and username of the user
+    :doc-author: Trelent
+    """
     st.title("SignUp")
     username = st.text_input("Username")
     email = st.text_input("Email")
