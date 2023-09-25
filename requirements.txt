@@ -23,3 +23,8 @@ tiktoken
 betabageldb
 requests
 pydantic[dotenv]
+unstructured
+pymupdf
+ebooklib
+python-pptx
+python-docx

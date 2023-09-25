@@ -1,13 +1,13 @@
 import pickle
 
-import langchain
+# import langchain
 import streamlit as st
 from dotenv import load_dotenv
 
 from pages.src.auth_services import FILE_NAME
 from pages.src.chats_history_services import get_chat_list, create_message, get_history, delete_chat
 
-langchain.verbose = False
+# langchain.verbose = False
 
 
 def get_chat_history(chat_id):
@@ -16,7 +16,6 @@ def get_chat_history(chat_id):
 
     :param chat_id: Get the chat's history
     :return: A list of messages, so we can print them out
-    :doc-author: Trelent
     """
     res = get_history(chat_id, access_token)
     if res.status_code == 200:
@@ -35,13 +34,12 @@ def delete_chat_history(chat_id):
 
     :param chat_id: Identify the chat to be deleted
     :return: A response object
-    :doc-author: Trelent
     """
     res = delete_chat(chat_id, access_token)
     if res.status_code == 404:
-        st.warning("Chat not found.")
+        st.error("Chat not found.")
     else:
-        st.error("Chat deleted successfully.")
+        st.warning("Chat deleted successfully.")
 
 
 # main funk  Streamlit
@@ -51,7 +49,6 @@ def main():
     It creates a Streamlit app and runs it.
 
     :return: The access token
-    :doc-author: Trelent
     """
     st.title("Exist chats")
 
