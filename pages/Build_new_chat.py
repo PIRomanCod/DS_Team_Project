@@ -11,18 +11,47 @@ from htmlTemplates import css
 from pages.src.auth_services import SERVER_URL, FILE_NAME
 from src.conf.config import settings
 
+from langchain.document_loaders import (
+    CSVLoader,
+    EverNoteLoader,
+    PyMuPDFLoader,
+    TextLoader,
+    UnstructuredEmailLoader,
+    UnstructuredEPubLoader,
+    UnstructuredHTMLLoader,
+    UnstructuredMarkdownLoader,
+    UnstructuredODTLoader,
+    UnstructuredPowerPointLoader,
+    UnstructuredWordDocumentLoader,
+)
+
+
 data_directory = settings.data_folder
 root_directory = settings.root_directory
 full_path = os.path.join(root_directory, data_directory)
 
 load_dotenv()
 
+supported_files = ['pdf', 'csv', 'docx', 'eml', 'epub', 'html', 'md', 'pptx', 'txt']
 
-def get_pdf_text(pdf_doc) -> str:
+LOADER_MAPPING = {
+    ".csv": (CSVLoader, {}),
+    ".docx": (UnstructuredWordDocumentLoader, {}),
+    ".eml": (UnstructuredEmailLoader, {}),
+    ".epub": (UnstructuredEPubLoader, {}),
+    ".html": (UnstructuredHTMLLoader, {}),
+    ".md": (UnstructuredMarkdownLoader, {}),
+    ".pdf": (PyMuPDFLoader, {}),
+    ".pptx": (UnstructuredPowerPointLoader, {}),
+    ".txt": (TextLoader, {"encoding": "utf8"}),
+}
+
+
+def get_text(pdf_doc) -> str:
     """
-    The get_pdf_text function takes a PDF document as input and returns the text of that document.
-    It does this by using the PyPDF2 library to read in each page of the PDF, extract its text, and then concatenate all
-    of those pages into one string.
+    The get_text function takes a document as input and returns the text of that document.
+    It does this by using the langchain.document_loaders  to read in each page of the supported_files,
+    extract its text, and then concatenate all of those pages into one string.
 
     :param pdf_doc: Specify the file path of the pdf document that you want to extract text from
     :return: A string of text from the pdf document
@@ -57,15 +86,37 @@ def main():
     st.write(css, unsafe_allow_html=True)
 
     st.subheader("Your documents")
-    pdf_doc = st.file_uploader("Upload your PDFs here and click on 'Process'", type='pdf')
+    pdf_doc = st.file_uploader("Upload your PDFs here and click on 'Process'", type=supported_files)
     if pdf_doc:
-        store_name = pdf_doc.name[:-4]
+        store_name, ext = pdf_doc.name.split(".")
+        if ext not in supported_files:
+            st.warning(f"Unsupported file extension '{ext}'")
 
         if st.button("Process"):
             with st.spinner("Processing"):
                 api_url = SERVER_URL + '/api/chats/'
-                raw_text = get_pdf_text(pdf_doc)
-                file_url = save_text_to_file(raw_text, full_path + store_name + '.txt')
+                temp_file_path = os.path.join(full_path, pdf_doc.name)
+                with open(temp_file_path, "wb") as temp_file:
+                    temp_file.write(pdf_doc.read())
+
+                if ext == 'txt':
+                    text_to_save = None
+                else:
+                    loader_class, loader_args = LOADER_MAPPING['.' + ext]
+                    loader = loader_class(temp_file_path, **loader_args)
+                    loader.load()
+                    raw_text = loader.load()
+                    if isinstance(raw_text, list):
+                        text_to_save = raw_text[0].page_content
+                    else:
+                        text_to_save = raw_text.page_content
+
+                if text_to_save is not None:
+                    file_url = save_text_to_file(text_to_save, full_path + store_name + '.txt')
+                    os.remove(temp_file_path)
+                else:
+                    file_url = temp_file_path
+
 
                 data = {
                     "title_chat": f"{store_name}",
