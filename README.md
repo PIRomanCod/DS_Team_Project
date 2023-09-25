@@ -29,7 +29,7 @@ pip install -r requirements.txt
 
 ### Shut off
 - terminal with uvicorn -> Press CTRL+C to quit
-- terminal with docker run: `docker-compose down` -> shut REdis+Postgress
+- terminal with docker run: `docker-compose down` -> shut Redis+Postgres
 
 ## Already implemented functionality FastApi:
 - error handler

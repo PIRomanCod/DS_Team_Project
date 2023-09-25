@@ -1,16 +1,8 @@
-import json
 import os
 import pickle
 
-import requests
 import streamlit as st
-from PyPDF2 import PdfReader
 from dotenv import load_dotenv
-
-from htmlTemplates import css
-from pages.src.auth_services import SERVER_URL, FILE_NAME
-from src.conf.config import settings
-
 from langchain.document_loaders import (
     CSVLoader,
     EverNoteLoader,
@@ -25,10 +17,10 @@ from langchain.document_loaders import (
     UnstructuredWordDocumentLoader,
 )
 
-
-data_directory = settings.data_folder
-root_directory = settings.root_directory
-full_path = os.path.join(root_directory, data_directory)
+from htmlTemplates import css
+from pages.src.auth_services import FILE_NAME
+from pages.src.build_new_chat_services import save_text_to_file, search_duplicate, set_data_url
+from pages.src.build_new_chat_services import full_path
 
 load_dotenv()
 
@@ -45,35 +37,6 @@ LOADER_MAPPING = {
     ".pptx": (UnstructuredPowerPointLoader, {}),
     ".txt": (TextLoader, {"encoding": "utf8"}),
 }
-
-
-def get_text(pdf_doc) -> str:
-    """
-    The get_text function takes a document as input and returns the text of that document.
-    It does this by using the langchain.document_loaders  to read in each page of the supported_files,
-    extract its text, and then concatenate all of those pages into one string.
-
-    :param pdf_doc: Specify the file path of the pdf document that you want to extract text from
-    :return: A string of text from the pdf document
-    """
-    text = ""
-    pdf_reader = PdfReader(pdf_doc)
-    for page in pdf_reader.pages:
-        text += page.extract_text()
-    return text
-
-
-def save_text_to_file(text, path):
-    """
-    The save_text_to_file function takes a string and saves it to a file.
-
-    :param text: Pass the text to be written to a file
-    :param path: Specify the location where the file should be saved
-    :return: The path of the file that was written to
-    """
-    with open(path, 'w', encoding='utf-8') as file:
-        file.write(text)
-    return path
 
 
 def main():
@@ -94,47 +57,40 @@ def main():
 
         if st.button("Process"):
             with st.spinner("Processing"):
-                api_url = SERVER_URL + '/api/chats/'
-                temp_file_path = os.path.join(full_path, pdf_doc.name)
-                with open(temp_file_path, "wb") as temp_file:
-                    temp_file.write(pdf_doc.read())
+                if not search_duplicate(store_name):
 
-                if ext == 'txt':
-                    text_to_save = None
-                else:
-                    loader_class, loader_args = LOADER_MAPPING['.' + ext]
-                    loader = loader_class(temp_file_path, **loader_args)
-                    loader.load()
-                    raw_text = loader.load()
-                    if isinstance(raw_text, list):
-                        text_to_save = raw_text[0].page_content
+                    temp_file_path = os.path.join(full_path, pdf_doc.name)
+
+                    with open(temp_file_path, "wb") as temp_file:
+                        temp_file.write(pdf_doc.read())
+
+                    if ext == 'txt':
+                        text_to_save = None
                     else:
-                        text_to_save = raw_text.page_content
+                        loader_class, loader_args = LOADER_MAPPING['.' + ext]
+                        loader = loader_class(temp_file_path, **loader_args)
+                        loader.load()
+                        raw_text = loader.load()
+                        if isinstance(raw_text, list):
+                            text_to_save = raw_text[0].page_content
+                        else:
+                            text_to_save = raw_text.page_content
 
-                if text_to_save is not None:
-                    file_url = save_text_to_file(text_to_save, full_path + store_name + '.txt')
-                    os.remove(temp_file_path)
+                    if text_to_save is not None:
+                        file_url = save_text_to_file(text_to_save, os.path.join(full_path, store_name + '.txt'))
+                        os.remove(temp_file_path)
+                    else:
+                        file_url = temp_file_path
+
+                    response = set_data_url(store_name, file_url, access_token)
+
+                    if response.status_code == 201:
+                        st.success("Chat created successfully.")
+                    else:
+                        st.error(f"Error: {response.status_code} - {response.text}")
+
                 else:
-                    file_url = temp_file_path
-
-
-                data = {
-                    "title_chat": f"{store_name}",
-                    "file_url": f"{file_url}"
-                }
-                data_json = json.dumps(data)
-
-                headers = {
-                    "Authorization": f"Bearer {access_token}",
-                    'Content-Type': 'application/json'
-                }
-
-                response = requests.post(api_url, data=data_json, headers=headers)
-
-                if response.status_code == 201:
-                    st.success("Chat created successfully.")
-                else:
-                    st.error(f"Error: {response.status_code} - {response.text}")
+                    st.error("Filename conflict. Change filename and try again")
 
 
 if __name__ == '__main__':

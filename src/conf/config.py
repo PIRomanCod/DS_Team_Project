@@ -19,7 +19,6 @@ class Settings(BaseSettings):
     cloudinary_api_secret: str = 'secret'
 
     data_folder: str = 'name'
-    root_directory: str = 'name'
 
     class Config:
         env_file = ".env"
