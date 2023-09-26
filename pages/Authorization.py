@@ -54,7 +54,10 @@ if __name__ == '__main__':
         reset_password_page()
 
     elif page == "Change avatar":
-        change_avatar_page(access_token, refresh_token)
+        if access_token:
+            change_avatar_page(access_token, refresh_token)
+        else:
+            start_page()
 
     if access_token:
         if st.button("Logout"):
