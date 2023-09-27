@@ -1,25 +1,23 @@
 import os
 import pickle
+from PyPDF2 import PdfReader
 
 import streamlit as st
 from dotenv import load_dotenv
 from langchain.document_loaders import (
     CSVLoader,
-    EverNoteLoader,
-    PyMuPDFLoader,
     TextLoader,
     UnstructuredEmailLoader,
     UnstructuredEPubLoader,
     UnstructuredHTMLLoader,
     UnstructuredMarkdownLoader,
-    UnstructuredODTLoader,
     UnstructuredPowerPointLoader,
     UnstructuredWordDocumentLoader,
 )
 
 from htmlTemplates import css
 from pages.src.auth_services import FILE_NAME
-from pages.src.build_new_chat_services import save_text_to_file, search_duplicate, set_data_url
+from pages.src.build_new_chat_services import save_text_to_file, search_duplicate, set_data_url, get_pdf_text
 from pages.src.build_new_chat_services import full_path
 
 load_dotenv()
@@ -33,7 +31,7 @@ LOADER_MAPPING = {
     ".epub": (UnstructuredEPubLoader, {}),
     ".html": (UnstructuredHTMLLoader, {}),
     ".md": (UnstructuredMarkdownLoader, {}),
-    ".pdf": (PyMuPDFLoader, {}),
+    ".pdf": (PdfReader),
     ".pptx": (UnstructuredPowerPointLoader, {}),
     ".txt": (TextLoader, {"encoding": "utf8"}),
 }
@@ -66,6 +64,8 @@ def main():
 
                     if ext == 'txt':
                         text_to_save = None
+                    if ext == 'pdf':
+                        text_to_save = get_pdf_text(temp_file_path)
                     else:
                         loader_class, loader_args = LOADER_MAPPING['.' + ext]
                         loader = loader_class(temp_file_path, **loader_args)

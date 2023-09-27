@@ -17,14 +17,12 @@ streamlit
 PyPDF2
 langchain
 faiss-cpu==1.7.4
-streamlit-extras
 openai
 tiktoken
-betabageldb
 requests
 pydantic[dotenv]
 unstructured
-pymupdf
 ebooklib
 python-pptx
 python-docx
+
