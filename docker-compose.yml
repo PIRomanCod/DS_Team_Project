@@ -1,11 +1,28 @@
-version: '3.9'
+version: '3.10'
 services:
+  ds_team_project:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ds_team_project
+    depends_on:
+      postgres:
+        condition: service_completed_successfully
+      redis:
+        condition: service_completed_successfully
+    environment:
+      - PYTHON_DATASOURCE_URL=postgresql+psycopg2://postgr_db:${POSTGRES_PASSWORD}@${POSTGRES_DOMAIN}:${POSTGRES_PORT}/${POSTGRES_DB}
+      - PYTHON_DATASOURCE_USER=POSTGRES_USER
+      - PYTHON_DATASOURCE_PASSWORD=POSTGRES_PASSWORD
   redis:
     image: redis:alpine
+    restart: unless-stopped
     ports:
       - "6379:6379"
   postgres:
     image: postgres:12
+    restart: unless-stopped
+    container_name: postgr_db
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}

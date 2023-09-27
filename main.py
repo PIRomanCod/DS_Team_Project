@@ -1,5 +1,6 @@
 import pathlib
 import time
+import uvicorn
 
 import redis.asyncio as redis
 from fastapi import FastAPI, Depends, HTTPException, Request
@@ -16,7 +17,7 @@ from src.routes import auth, users, chats, chathistory
 
 app = FastAPI()
 
-origins = [
+origins = ["*",
     "http://localhost:3000"
 ]
 
@@ -117,6 +118,6 @@ async def startup():
                           encoding="utf-8")
     await FastAPILimiter.init(r)
 
-#
-# if __name__ == '__main__':
-#     uvicorn.run('main:app', reload=True)
+
+if __name__ == '__main__':
+    uvicorn.run('main:app', reload=True)

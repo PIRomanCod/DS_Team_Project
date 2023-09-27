@@ -3,7 +3,7 @@ import json
 
 import requests
 from dotenv import load_dotenv
-
+from PyPDF2 import PdfReader
 from src.conf.config import settings
 from pages.src.auth_services import SERVER_URL, FILE_NAME
 
@@ -69,6 +69,22 @@ def set_data_url(store_name, file_url, acc_token):
     }
 
     return requests.post(api_url, data=data_json, headers=headers)
+
+
+def get_pdf_text(pdf_doc) -> str:
+    """
+    The get_pdf_text function takes a PDF document as input and returns the text of that document.
+    It does this by using the PyPDF2 library to read in each page of the PDF, extract its text, and then concatenate all
+    of those pages into one string.
+
+    :param pdf_doc: Specify the file path of the pdf document that you want to extract text from
+    :return: A string of text from the pdf document
+    """
+    text = ""
+    pdf_reader = PdfReader(pdf_doc)
+    for page in pdf_reader.pages:
+        text += page.extract_text()
+    return text
 
 
 load_dotenv()
