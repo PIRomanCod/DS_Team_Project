@@ -1,0 +1,10 @@
+pydantic[dotenv]
+streamlit
+PyPDF2
+requests
+unstructured
+ebooklib
+python-pptx
+python-docx
+langchain
+

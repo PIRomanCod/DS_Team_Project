@@ -1,14 +1,17 @@
 import os
 import json
+import pathlib
 
 import requests
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
-from src.conf.config import settings
-from pages.src.auth_services import SERVER_URL, FILE_NAME
+
+from src.config.config import settings
+from pages.src.auth_services import SERVER_URL
 
 data_directory = settings.data_folder
-root_directory = os.getcwd()
+# root_directory = os.getcwd()
+root_directory = pathlib.Path(__file__).parent.parent.parent.parent
 full_path = os.path.join(root_directory, data_directory)
 
 
