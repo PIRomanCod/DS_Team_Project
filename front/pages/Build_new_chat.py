@@ -1,6 +1,7 @@
 import os
 import pickle
 from PyPDF2 import PdfReader
+import uuid
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -13,6 +14,7 @@ from langchain.document_loaders import (
     UnstructuredMarkdownLoader,
     UnstructuredPowerPointLoader,
     UnstructuredWordDocumentLoader,
+    WebBaseLoader
 )
 
 from htmlTemplates import css
@@ -34,6 +36,7 @@ LOADER_MAPPING = {
     ".pdf": (PdfReader),
     ".pptx": (UnstructuredPowerPointLoader, {}),
     ".txt": (TextLoader, {"encoding": "utf8"}),
+
 }
 
 
@@ -47,25 +50,47 @@ def main():
     st.write(css, unsafe_allow_html=True)
 
     st.subheader("Your documents")
-    pdf_doc = st.file_uploader("Upload your PDFs here and click on 'Process'", type=supported_files)
-    if pdf_doc:
-        store_name, ext = pdf_doc.name.split(".")
-        if ext not in supported_files:
-            st.warning(f"Unsupported file extension '{ext}'")
+    choice = st.radio("Choose an option:", ("Upload a file", "Enter a web link"))
+    if choice == "Enter a web link":
+        new_doc = st.text_input("Enter a web link:")
+        if st.button("Process Web Link"):
+            loader = WebBaseLoader(web_path=new_doc)
+            documents = loader.load()
+            text_to_save = ""
+            for doc in documents:
+                text_to_save += doc.page_content
+
+            store_name = str(uuid.uuid4())
+            file_url = save_text_to_file(text_to_save, os.path.join(full_path, store_name + '.txt'))
+            response = set_data_url(store_name, file_url, access_token)
+
+            if response.status_code == 201:
+                st.success("Web link content saved successfully.")
+            else:
+                st.error(f"Error: {response.status_code} - {response.text}")
+
+    elif choice == "Upload a file":
+        new_doc = st.file_uploader("Upload your PDFs here and click on 'Process'", type=supported_files)
+        if new_doc:
+            store_name, ext = new_doc.name.lower().split(".")
+            if ext not in supported_files:
+                st.warning(f"Unsupported file extension '{ext}'")
+
 
         if st.button("Process"):
             with st.spinner("Processing"):
                 if not search_duplicate(store_name):
 
-                    temp_file_path = os.path.join(full_path, pdf_doc.name)
+                    temp_file_path = os.path.join(full_path, new_doc.name)
 
                     with open(temp_file_path, "wb") as temp_file:
-                        temp_file.write(pdf_doc.read())
+                        temp_file.write(new_doc.read())
 
                     if ext == 'txt':
                         text_to_save = None
-                    if ext == 'pdf':
+                    elif ext == 'pdf':
                         text_to_save = get_pdf_text(temp_file_path)
+
                     else:
                         loader_class, loader_args = LOADER_MAPPING['.' + ext]
                         loader = loader_class(temp_file_path, **loader_args)

@@ -38,7 +38,7 @@ async def get_context(chat_id: int, db: Session, user: User) -> List:
         separator="\n",
         chunk_size=1000,
         chunk_overlap=200,
-        length_function=len
+        length_function=len,
     )
     chunks = text_splitter.split_text(text)
 
