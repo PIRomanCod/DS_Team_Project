@@ -66,6 +66,7 @@ pip install -r requirements.txt
 # How to dokerizate the app:
 - run in terminal: `docker build -t researcher .` -> create an image
 - run in terminal: `docker run -p 8000:8000 -p 8501:8501 researcher` -> run your app
+- run in terminal: `docker run -p 8000:8000 -p 8501:8501 -p 5432:5432 -p 6379:6379 researcher` -> run your app
 - run in terminal: `docker run -p 8501:8501 researcher` -> run your app
 
 

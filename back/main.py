@@ -1,8 +1,8 @@
 import pathlib
 import time
 import uvicorn
-
 import redis.asyncio as redis
+
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -13,12 +13,12 @@ from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 
 from src.database.db import get_db
-from src.routes import auth, users, chats, chathistory
+from src.routes import users, auth, chats, chathistory
 
 app = FastAPI()
 
 origins = ["*",
-    "http://localhost:3000"
+    "http://localhost:8000"
 ]
 
 app.add_middleware(
@@ -117,7 +117,7 @@ async def startup():
                           decode_responses=True,
                           encoding="utf-8")
     await FastAPILimiter.init(r)
-
+#
 
 if __name__ == '__main__':
     uvicorn.run('main:app', reload=True)

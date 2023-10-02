@@ -1,6 +1,6 @@
 import requests
 
-from pages.src.auth_services import SERVER_URL, FILE_NAME
+from pages.src.auth_services import SERVER_URL
 
 
 def get_chat_list(access_token):
