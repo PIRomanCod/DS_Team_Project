@@ -11,8 +11,9 @@ from pages.src.auth_services import SERVER_URL
 
 data_directory = settings.data_folder
 # root_directory = os.getcwd()
+raw_data = "raw_data"
 root_directory = pathlib.Path(__file__).parent.parent.parent.parent
-full_path = os.path.join(root_directory, data_directory)
+full_path = os.path.join(root_directory, data_directory, raw_data)
 
 
 def save_text_to_file(text, path):

@@ -35,8 +35,8 @@ class Chat(Base):
     chat_data = Column(String, nullable=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    user = relationship('User', backref="chats")
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    # user = relationship('User', backref="chats")
 
 
 class ChatHistory(Base):
@@ -44,7 +44,7 @@ class ChatHistory(Base):
     id = Column(Integer, primary_key=True, index=True)
     message = Column(String, nullable=False)
     created_at = Column(DateTime, default=func.now())
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    chat_id = Column(Integer, ForeignKey("chats.id"), nullable=True)
-    user = relationship('User', backref="chathistories")
-    chat = relationship('Chat', backref="chathistories")
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    chat_id = Column(Integer, ForeignKey("chats.id", ondelete="CASCADE"), nullable=False)
+    # user = relationship('User', backref="chathistories")
+    # chat = relationship('Chat', backref="chathistories")
