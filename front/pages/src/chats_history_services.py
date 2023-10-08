@@ -52,6 +52,22 @@ def create_message(chat_id, message, acc_token):
         return "Error creating question"
 
 
+def merge_chats(chat_ids, acc_token):
+
+    api_url = SERVER_URL + "/api/chats/merge"
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    data = chat_ids
+    response = requests.post(api_url, json=data, headers=headers)
+    if response.status_code == 201:
+        return response.json()['title_chat']
+    else:
+        return response.json()
+
+
+
 def get_history(chat_id, acc_token):
     """
     The get_history function takes in a chat_id and an access token,

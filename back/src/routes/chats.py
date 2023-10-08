@@ -16,6 +16,7 @@ router = APIRouter(prefix='/chats', tags=["chats"])
 allowed_get_chats = RoleAccess([Role.admin, Role.moderator, Role.user])  # noqa
 allowed_add_chats = RoleAccess([Role.admin, Role.moderator, Role.user])  # noqa
 allowed_delete_chats = RoleAccess([Role.admin, Role.moderator, Role.user])  # noqa
+allowed_merge_chats = RoleAccess([Role.admin, Role.moderator, Role.user])  # noqa
 
 
 @router.post("/", response_model=ChatModel, status_code=status.HTTP_201_CREATED,
@@ -86,3 +87,31 @@ async def delete_chat(chat_id: int, db: Session = Depends(get_db),
     if deleted_chat is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.CHAT_NOT_FOUND)
     return deleted_chat
+
+
+@router.post("/merge", response_model=ChatModel, status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(allowed_merge_chats)])
+async def merge_chats(chats_to_merge: List[int], db: Session = Depends(get_db),
+                      current_user: User = Depends(auth_service.get_current_user)):
+    """
+    The **merge_chats** function merges multiple existing chats into a new chat.
+
+    :param chats_to_merge: List[int]: List of chat ids to merge
+    :param db: Session: Pass the database session to the repository layer
+    :param current_user: User: Get the current user
+    :return: A new chat object representing the merged chats
+    """
+    # Check if all chat ids in chats_to_merge are valid and accessible by the current user
+    for chat_id in chats_to_merge:
+        chat = await repository_chats.get_chat_by_id(chat_id, db, current_user)
+        if chat is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.CHAT_NOT_FOUND)
+
+    # Merge the chats
+    merged_chat = await repository_chats.merge_chats(chats_to_merge, db, current_user)
+
+    if merged_chat is None:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Chat merging failed")
+
+    return merged_chat

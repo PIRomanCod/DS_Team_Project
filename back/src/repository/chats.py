@@ -1,9 +1,22 @@
+from typing import List
+import os
+import pathlib
+
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, desc
 
+from src.conf.config import settings
+from dotenv import load_dotenv
+
+load_dotenv()
 from src.database.models import User, Chat, Role
 from src.schemas import ChatBase
-from src.services.file_service import delete_source_file, delete_vectorstore
+from src.services.file_service import delete_source_file, delete_vectorstore, merge_faiss_by_chat_ids, save_text_to_file
+
+root_directory = pathlib.Path(__file__).parent.parent.parent.parent
+data_folder = settings.data_folder
+raw_data = "raw_data"
+FULL_PATH = os.path.join(root_directory, data_folder, raw_data)
 
 
 async def create_chat(body: ChatBase, db: Session, user: User) -> Chat:
@@ -70,3 +83,44 @@ async def get_chats(limit: int, offset: int, user: User, db: Session) -> list | 
     chats = db.query(Chat).filter(and_(Chat.user_id == user.id)). \
         order_by(desc(Chat.created_at)).limit(limit).offset(offset).all()
     return chats
+
+
+async def merge_chats(chats_to_merge: List[int], db: Session, user: User) -> Chat | None:
+    """
+    The **merge_chats** function merges multiple chats into a new chat.
+
+    :param chats_to_merge: List[int]: List of chat ids to merge
+    :param db: Session: Access the database
+    :param user: User: Get the current user
+    :return: The new chat object representing the merged chats
+    """
+    # Call merge_faiss_by_chat_ids with the chat_ids to merge
+    # await merge_faiss_by_chat_ids(chats_to_merge)
+
+    # Save the merged chat data to a new resource file using the function
+    # Copy data from the chats being merged into the new chat
+    merged_chat_files = ""
+    for chat_id in chats_to_merge:
+        chat = db.query(Chat).filter(Chat.id == chat_id).first()
+        if chat:
+            with open(chat.file_url, "r", encoding="utf-8") as chat_file:
+                chat_data = chat_file.read()
+                merged_chat_files += chat_data
+    title_chat = f"Merged Chats {', '.join(map(str, chats_to_merge))}"
+    chat_file_path = os.path.join(FULL_PATH, f"{title_chat}.txt")
+    file_url = await save_text_to_file(merged_chat_files, chat_file_path)
+
+    # Create a new chat that represents the merged chats
+    new_chat = Chat(title_chat=title_chat, chat_data=True, user_id=user.id, file_url=file_url)
+    db.add(new_chat)
+    db.commit()
+    db.refresh(new_chat)
+
+    # You may want to add logic here to copy data from the chats being merged into the new chat
+
+
+    # # Delete the original chats that were merged
+    # for chat_id in chats_to_merge:
+    #     await delete_chat(chat_id, db, user)
+
+    return new_chat
