@@ -3,7 +3,7 @@ from sqlalchemy import and_, desc
 
 from src.database.models import User, Chat, Role
 from src.schemas import ChatBase
-from src.services.file_service import delete_source_file
+from src.services.file_service import delete_source_file, delete_vectorstore
 
 
 async def create_chat(body: ChatBase, db: Session, user: User) -> Chat:
@@ -38,6 +38,8 @@ async def delete_chat(chat_id: int, db: Session, user: User) -> Chat | None:
     if chat:
         if user.roles in [Role.admin, Role.moderator] or chat.user_id == user.id:
             await delete_source_file(chat.file_url)
+            await delete_vectorstore(chat_id)
+
             db.delete(chat)
             db.commit()
     return chat

@@ -18,7 +18,7 @@ async def create_message(chat_id: int, body: ChatHistoryBase, db: Session, user:
     :return: A new chat_history object
     """
     context = await get_context(chat_id, db, user)
-    answer = get_conversation_chain(body.message, context)
+    answer = await get_conversation_chain(body.message, context, chat_id)
 
     response_dict = ast.literal_eval(answer)
     user_question = 'Q: ' + response_dict['user_messages'][0]
