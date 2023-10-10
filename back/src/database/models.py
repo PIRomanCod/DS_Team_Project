@@ -36,7 +36,6 @@ class Chat(Base):
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    # user = relationship('User', backref="chats")
 
 
 class ChatHistory(Base):
@@ -46,5 +45,3 @@ class ChatHistory(Base):
     created_at = Column(DateTime, default=func.now())
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     chat_id = Column(Integer, ForeignKey("chats.id", ondelete="CASCADE"), nullable=False)
-    # user = relationship('User', backref="chathistories")
-    # chat = relationship('Chat', backref="chathistories")

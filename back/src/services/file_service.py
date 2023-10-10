@@ -31,7 +31,7 @@ async def load_vectorstore(chat_id):
     return vectorstore
 
 
-def delete_vectorstore(chat_id):
+async def delete_vectorstore(chat_id):
     vectorstore_file_path_faiss = os.path.join(FULL_PATH, f"{chat_id}.faiss")
     vectorstore_file_path_pkl = os.path.join(FULL_PATH, f"{chat_id}.pkl")
     if os.path.exists(vectorstore_file_path_faiss):
