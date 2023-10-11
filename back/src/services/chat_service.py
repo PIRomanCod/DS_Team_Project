@@ -6,6 +6,8 @@ from typing import List
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings import OpenAIEmbeddings
+from langchain.llms import Replicate
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
@@ -23,6 +25,7 @@ data_folder = settings.data_folder
 V_DB = "V_DB"
 FULL_PATH = os.path.join(root_directory, data_folder, V_DB)
 EMBEDDINGS = OpenAIEmbeddings()
+# EMBEDDINGS = HuggingFaceEmbeddings()
 
 
 async def get_context(chat_id: int, db: Session, user: User) -> List:
@@ -75,6 +78,12 @@ async def get_conversation_chain(user_question, context, chat_id) -> str:
         await save_vectorstore(vectorstore, chat_id)
 
     llm = ChatOpenAI(model='gpt-3.5-turbo')
+    # Initialize Replicate Llama2 Model
+    # llm = Replicate(
+    #     model="a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5",
+    #     input={"temperature": 0.75, "max_length": 3000}
+    # )
+
     memory = ConversationBufferMemory(
         memory_key='chat_history', return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
