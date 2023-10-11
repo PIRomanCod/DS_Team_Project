@@ -9,7 +9,7 @@ def main():
     st.write(css, unsafe_allow_html=True)
     # author of banner: Afaque Umer
     st.image("static/banner.JPG")
-    st.title("Welcome to PDF Researcher!")
+    st.title("Welcome to AI Docs Researcher!")
     st.header("Sign up and enjoy AI-powered document research and analysis without language restrictions")
 
 

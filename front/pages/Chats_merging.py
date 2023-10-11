@@ -25,14 +25,14 @@ def main():
     selected_chats_to_merge = st.multiselect("Select chats to merge:",
                                              [chat["title_chat"] for chat in chat_list])
     # Button to merge chats
-    if st.button("Merge Chats"):
+    merge_button = st.button("Merge Chats")
+    if merge_button:
 
         selected_chat_ids = [chat["id"] for chat in chat_list if chat["title_chat"] in selected_chats_to_merge]
         st.write(selected_chat_ids)
         if len(selected_chat_ids) >= 2:
-            if st.button("Confirm merging"):
-                response = merge_chats(selected_chat_ids, access_token)
-                st.write(f"Merge request sent. Server response: {response}")
+            response = merge_chats(selected_chat_ids, access_token)
+            st.write(f"Merge request sent. Server response: {response}")
 
     # Refresh chat list to reflect changes (this is an example, you can adjust it as needed)
     chat_list = get_chat_list(access_token)

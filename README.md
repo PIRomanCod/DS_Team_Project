@@ -1,7 +1,7 @@
 # DS_Team_Project
 Hello we are one of the best DS developers Team at GoIT DS_9 flow. 
 
-"AI Docs Analyzer" allows users to easily access advanced technologies for processing and analyzing text information 
+"AI Docs Researcher" allows users to easily access advanced technologies for processing and analyzing text information 
 using modern methods of artificial intelligence.
 
 The main functionality of the project includes:
@@ -30,14 +30,14 @@ between client and server by using a signed token.
 - The ability to reset the user's password by email.
 - Ability to create and edit user profiles, save users data in the database.
 - all users can work only with their documents.
-- history of requests to LLM available only for the user
+- data, files and history of requests to LLM available only for the user
 
 5. Admin abilities:
 - Separation of users by roles such as admin, moderator and regular user. Each role will have appropriate access 
 rights to the functionality of the web service.
 - Redis is used to limit the number of requests and cache data to improve performance
 
-6. "AI Docs Analyzer" uses technologies such as: FastAPI, Streamlit, PostgreSQL, Docker, OpenAI, Faiss, Git, LangChain, Cloudinary, Redis.
+6. "AI Docs Researcher" uses technologies such as: FastAPI, Streamlit, PostgreSQL, Docker, OpenAI, Faiss, Git, LangChain, Cloudinary, Redis.
 
 
 # How to start for developers:
