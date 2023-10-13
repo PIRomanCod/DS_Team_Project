@@ -41,39 +41,17 @@ rights to the functionality of the web service.
 
 
 # How to start for developers:
-- update project from Git
-- create environment 
-```bash
-poetry export --without-hashes --format requirements.txt --output requirements.txt
-pip install -r requirements.txt
-```
+- unload project from Git
+
 - create in root folder your own .env file like .env.example
+
 - run docker application
-- run in terminal: `docker-compose up` -> up Redis+Postgres
-- run in terminal: `alembic upgrade head` -> implementation current models to DB
-- run in terminal: `uvicorn main:app --host localhost --port 8000 --reload` -> start application
-- run in terminal: `streamlit run PDF_Researcher.py` -> start front application
-- now you have access to:
-- http://127.0.0.1:8000/docs -> Swagger documentation
-- http://127.0.0.1:8000/redoc -> Redoc documentation
-- http://127.0.0.1:8000/ -> template
-- http://localhost:8501/ -> Streamlit frontend
 
-
-# How to dokerizate the app:
-- run in terminal: `docker build -t researcher .` -> create an image
-- run in terminal: `docker run -p 8000:8000 -p 8501:8501 researcher` -> run your app
-- run in terminal: `docker run -p 8000:8000 -p 8501:8501 -p 5432:5432 -p 6379:6379 researcher` -> run your app
-- run in terminal: `docker run -p 8501:8501 researcher` -> run your app
-
-
-### After changes in DB models:
-- `alembic revision --autogenerate -m "name"` -> generation of migration
-- `alembic upgrade head` -> implementation to DB
+- run in terminal: `docker-compose up` -> up application for use
 
 ### Shut off
-- terminal with uvicorn -> Press CTRL+C to quit
-- terminal with docker run: `docker-compose down` -> shut Redis+Postgres
+
+- terminal with docker run: `docker-compose down` -> shut off application
 
 
 # Good luck!!!

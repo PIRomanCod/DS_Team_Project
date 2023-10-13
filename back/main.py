@@ -112,7 +112,7 @@ async def startup():
     from src.conf.config import settings
     r = await redis.Redis(host=settings.redis_host,
                           port=settings.redis_port,
-                          # password=settings.redis_password,
+                          password=settings.redis_password,
                           db=0,
                           decode_responses=True,
                           encoding="utf-8")

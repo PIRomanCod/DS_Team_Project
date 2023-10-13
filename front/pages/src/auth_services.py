@@ -1,4 +1,5 @@
 import json
+import os
 import pickle
 import configparser
 
@@ -8,7 +9,8 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 
 FILE_NAME = config.get("DEV", "token_name")
-SERVER_URL = config.get("DEV", "app_url")
+SERVER_URL = config.get("DEV", "APP_URL")
+SERVER_URL = os.getenv(SERVER_URL)
 
 
 def load_token(filename=FILE_NAME):

@@ -7,4 +7,5 @@ ebooklib
 python-pptx
 python-docx
 langchain
-
+pydantic==1.10.7
+python-dotenv

@@ -7,7 +7,7 @@ from src.database.db import get_db
 from src.repository import users as repository_users
 from src.schemas import UserModel, UserResponse, TokenModel, RequestEmail, ResetPassword
 from src.services.auth import auth_service, auth_password
-from src.services.email import send_email
+from src.services.email_service import send_email
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 security = HTTPBearer()
